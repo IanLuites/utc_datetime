@@ -51,4 +51,86 @@ defmodule UTCDateTime do
       microsecond: microsecond
     }
   end
+
+  ### NaiveDateTime ###
+
+  @doc ~S"""
+  Converts the given `UTCDateTime` into a `NaiveDateTime`.
+
+  ## Examples
+
+  iex> dt = %UTCDateTime{year: 2016, month: 5, day: 24,
+  ...>                   hour: 13, minute: 26, second: 8,
+  ...>                   microsecond: {3000, 3}}
+  iex> UTCDateTime.to_naive(dt)
+  ~N[2016-05-24 13:26:08.003]
+  """
+  @spec to_naive(NaiveDateTime.t(), Calendar.calendar()) :: t
+  def to_naive(utc_datetime, calendar \\ Calendar.ISO)
+
+  def to_naive(
+        %__MODULE__{
+          year: year,
+          month: month,
+          day: day,
+          hour: hour,
+          minute: minute,
+          second: second,
+          microsecond: microsecond
+        },
+        calendar
+      ) do
+    %NaiveDateTime{
+      year: year,
+      month: month,
+      day: day,
+      calendar: calendar,
+      hour: hour,
+      minute: minute,
+      second: second,
+      microsecond: microsecond
+    }
+  end
+
+  @doc ~S"""
+  Converts the given `NaiveDateTime` to `UTCDateTime`.
+
+  It expects the `NaiveDateTime` to be in the "Etc/UTC" time zone.
+
+  ## Examples
+
+  ```elixir
+  iex> UTCDateTime.from_naive(~N[2016-05-24 13:26:08.003])
+  %UTCDateTime{
+    day: 24,
+    hour: 13,
+    microsecond: {3000, 3},
+    minute: 26,
+    month: 5,
+    second: 8,
+    year: 2016
+  }
+  ```
+  """
+  @spec from_naive(NaiveDateTime.t()) :: t
+  def from_naive(naive_datetime)
+
+  def from_naive(%NaiveDateTime{
+        year: year,
+        month: month,
+        day: day,
+        hour: hour,
+        minute: minute,
+        second: second,
+        microsecond: microsecond
+      }),
+      do: %__MODULE__{
+        year: year,
+        month: month,
+        day: day,
+        hour: hour,
+        minute: minute,
+        second: second,
+        microsecond: microsecond
+      }
 end
