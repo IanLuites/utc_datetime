@@ -1,29 +1,70 @@
 defmodule UTCDateTime.MixProject do
   use Mix.Project
 
+  @version "0.0.1"
+
   def project do
     [
       app: :utc_datetime,
       description: "A datetime implementation constraint to UTC.",
-      version: "0.0.1",
+      version: @version,
       elixir: "~> 1.9",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      package: package(),
+
+      # Testing
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: [
+        coveralls: :test,
+        "coveralls.detail": :test,
+        "coveralls.post": :test,
+        "coveralls.html": :test
+      ],
+      dialyzer: [ignore_warnings: ".dialyzer", plt_add_deps: true],
+
+      # Docs
+      name: "UTC DateTime",
+      source_url: "https://github.com/IanLuites/utc_datetime",
+      homepage_url: "https://github.com/IanLuites/utc_datetime",
+      docs: [
+        main: "readme",
+        extras: ["README.md"],
+        source_ref: "v#{@version}",
+        source_url: "https://github.com/IanLuites/utc_datetime"
+      ]
     ]
   end
 
-  # Run "mix help compile.app" to learn about applications.
-  def application do
+  def package do
     [
-      extra_applications: [:logger]
+      name: :utc_datetime,
+      maintainers: ["Ian Luites"],
+      licenses: ["MIT"],
+      files: [
+        # Elixir
+        "lib/utc_datetime",
+        "lib/utc_datetime.ex",
+        ".formatter.exs",
+        "mix.exs",
+        "README*",
+        "LICENSE*"
+      ],
+      links: %{
+        "GitHub" => "https://github.com/IanLuites/utc_datetime"
+      }
     ]
   end
 
-  # Run "mix help deps" to learn about dependencies.
+  def application do
+    [extra_applications: [:logger]]
+  end
+
   defp deps do
     [
-      # {:dep_from_hexpm, "~> 0.3.0"},
-      # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
+      {:analyze, "~> 0.1.10", only: [:dev, :test], runtime: false, optional: true},
+      {:benchee, "~> 1.0", only: :dev, optional: true},
+      {:dialyxir, "~> 1.0.0-rc.7 ", only: :dev, runtime: false, optional: true}
     ]
   end
 end
