@@ -25,6 +25,60 @@ defmodule UTCDateTime do
           microsecond: Calendar.microsecond()
         }
 
+  ### Sigil ###
+
+  defmacro __using__(_opts \\ []) do
+    quote do
+      require unquote(__MODULE__)
+      import unquote(__MODULE__), only: [sigil_Z: 2]
+    end
+  end
+
+  @doc ~S"""
+  Handles the sigil `~Z` to create a `UTCDateTime`.
+
+  By default, this sigil requires UTC date times
+  to be written in the ISO8601 format:
+
+      ~Z[yyyy-mm-dd hh:mm:ssZ]
+      ~Z[yyyy-mm-dd hh:mm:ss.ssssssZ]
+      ~Z[yyyy-mm-ddThh:mm:ss.ssssss+00:00]
+
+  such as:
+
+      ~Z[2015-01-13 13:00:07Z]
+      ~Z[2015-01-13T13:00:07.123+00:00]
+
+  The given `utc_datetime_string` must include "Z" or "00:00" offset
+  which marks it as UTC, otherwise an error is raised.
+
+  The lower case `~z` variant does not exist as interpolation
+  and escape characters are not useful for date time sigils.
+  More information on date times can be found in the `UTCDateTime` module.
+
+  ## Examples
+
+  ```elixir
+  iex> ~Z[2015-01-13 13:00:07Z]
+  ~Z[2015-01-13 13:00:07Z]
+  iex> ~Z[2015-01-13T13:00:07.001+00:00]
+  ~Z[2015-01-13 13:00:07.001Z]
+  ```
+  """
+  defmacro sigil_Z(utc_datetime_string, modifiers)
+
+  defmacro sigil_Z({:<<>>, _, [string]}, []) do
+    # A placeholder to improve testing
+    string
+    |> NaiveDateTime.from_iso8601!()
+    |> from_naive
+    |> Macro.escape()
+  end
+
+  defimpl Inspect do
+    def inspect(utc_datetime, _), do: "~Z[" <> UTCDateTime.to_rfc3339(utc_datetime) <> "]"
+  end
+
   ### Epochs ###
 
   @doc ~S"""
@@ -107,15 +161,7 @@ defmodule UTCDateTime do
 
   ```elixir
   iex> UTCDateTime.from_naive(~N[2016-05-24 13:26:08.003])
-  %UTCDateTime{
-    day: 24,
-    hour: 13,
-    microsecond: {3000, 3},
-    minute: 26,
-    month: 5,
-    second: 8,
-    year: 2016
-  }
+  ~Z[2016-05-24 13:26:08.003]
   ```
   """
   @spec from_naive(NaiveDateTime.t()) :: t
