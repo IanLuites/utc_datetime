@@ -133,4 +133,65 @@ defmodule UTCDateTime do
         second: second,
         microsecond: microsecond
       }
+
+  ### RFC 3339 ###
+
+  # Very Naive, just for debugging
+  import __MODULE__.Utility, only: [pad2: 1, pad4: 1, microsecond: 2]
+
+  @doc ~S"""
+  Placeholder
+
+  Convert `utc_datetime` to `RFC3339` string format.
+
+  ## Examples
+
+  ```elixir
+  iex> UTCDateTime.to_rfc3339(~Z[2019-12-14 08:06:24.289659])
+  "2019-12-14 08:06:24.289659"
+  ```
+  """
+  @spec to_rfc3339(t) :: String.t()
+  def to_rfc3339(utc_datetime)
+
+  def to_rfc3339(%UTCDateTime{
+        year: year,
+        month: month,
+        day: day,
+        hour: hour,
+        minute: minute,
+        second: second,
+        microsecond: {microsecond, precision}
+      }) do
+    if precision == 0 do
+      :erlang.iolist_to_binary([
+        pad4(year),
+        "-",
+        pad2(month),
+        "-",
+        pad2(day),
+        " ",
+        pad2(hour),
+        ":",
+        pad2(minute),
+        ":",
+        pad2(second)
+      ])
+    else
+      :erlang.iolist_to_binary([
+        pad4(year),
+        "-",
+        pad2(month),
+        "-",
+        pad2(day),
+        " ",
+        pad2(hour),
+        ":",
+        pad2(minute),
+        ":",
+        pad2(second),
+        microsecond(microsecond, precision)
+      ])
+    end
+  end
 end
