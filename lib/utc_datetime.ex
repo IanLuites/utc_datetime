@@ -25,6 +25,8 @@ defmodule UTCDateTime do
           microsecond: Calendar.microsecond()
         }
 
+  ### Epochs ###
+
   @doc ~S"""
   Returns the current UTC datetime.
 
@@ -57,6 +59,10 @@ defmodule UTCDateTime do
   @doc ~S"""
   Converts the given `UTCDateTime` into a `NaiveDateTime`.
 
+  The given `utc_datetime` does not contain a calendar,
+  so `Calendar.ISO` is set by default.
+  It is possible to manually pass a different calendar.
+
   ## Examples
 
   iex> dt = %UTCDateTime{year: 2016, month: 5, day: 24,
@@ -65,7 +71,7 @@ defmodule UTCDateTime do
   iex> UTCDateTime.to_naive(dt)
   ~N[2016-05-24 13:26:08.003]
   """
-  @spec to_naive(NaiveDateTime.t(), Calendar.calendar()) :: t
+  @spec to_naive(UTCDateTime.t(), Calendar.calendar()) :: NaiveDateTime.t()
   def to_naive(utc_datetime, calendar \\ Calendar.ISO)
 
   def to_naive(
@@ -95,7 +101,7 @@ defmodule UTCDateTime do
   @doc ~S"""
   Converts the given `NaiveDateTime` to `UTCDateTime`.
 
-  It expects the `NaiveDateTime` to be in the "Etc/UTC" time zone.
+  It expects the given `naive_datetime` to be in the "Etc/UTC" time zone.
 
   ## Examples
 
