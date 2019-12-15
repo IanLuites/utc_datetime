@@ -70,10 +70,8 @@ defmodule UTCDateTime do
   defmacro sigil_Z(utc_datetime_string, modifiers)
 
   defmacro sigil_Z({:<<>>, _, [string]}, []) do
-    # A placeholder to improve testing
     string
-    |> NaiveDateTime.from_iso8601!()
-    |> from_naive
+    |> from_iso8601!()
     |> Macro.escape()
   end
 
