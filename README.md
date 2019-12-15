@@ -12,6 +12,16 @@ A secondary goal is to be more efficient or at least on par with
 the build in datetimes. (`DateTime`, `NaiveDateTime`)
 In practice the goal is to use less memory and
 perform common [shared] actions faster.
+
+
+## Quick Setup
+
+```elixir
+iex> UTCDateTime.utc_now
+~Z[2019-12-14 16:08:13.042407]
+```
+
+
 ## Installation
 
 The package can be installed
