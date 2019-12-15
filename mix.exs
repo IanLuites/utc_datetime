@@ -57,14 +57,17 @@ defmodule UTCDateTime.MixProject do
   end
 
   def application do
-    [extra_applications: [:logger]]
+    [extra_applications: [:ecto, :logger]]
   end
 
   defp deps do
     [
       {:analyze, "~> 0.1.10", only: [:dev, :test], runtime: false, optional: true},
       {:benchee, "~> 1.0", only: :dev, optional: true},
-      {:dialyxir, "~> 1.0.0-rc.7 ", only: :dev, runtime: false, optional: true}
+      {:dialyxir, "~> 1.0.0-rc.7 ", only: :dev, runtime: false, optional: true},
+
+      # Optional Integrations
+      {:ecto, ">= 3.0.0", optional: true}
     ]
   end
 end
