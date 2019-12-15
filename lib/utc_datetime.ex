@@ -1115,7 +1115,7 @@ defmodule UTCDateTime do
 
   ## Examples
 
-  ``elixir
+  ```elixir
   iex> UTCDateTime.to_date(~Z[2002-01-13 23:00:07])
   ~D[2002-01-13]
   ```
