@@ -1094,4 +1094,26 @@ defmodule UTCDateTime do
               "cannot convert #{inspect(tuple)} to UTC datetime, reason: #{inspect(reason)}"
     end
   end
+
+  ### Date and Time ###
+
+  @doc ~S"""
+  Converts a `UTCDateTime` into a `Date`.
+
+  Because `Date` does not hold time information,
+  data will be lost during the conversion.
+
+  ## Examples
+
+  ``elixir
+  iex> UTCDateTime.to_date(~Z[2002-01-13 23:00:07])
+  ~D[2002-01-13]
+  ```
+  """
+  @spec to_date(UTCDateTime.t(), Calendar.calendar()) :: Date.t()
+  def to_date(utc_datetime, calendar \\ Calendar.ISO)
+
+  def to_date(%UTCDateTime{year: year, month: month, day: day}, calendar) do
+    %Date{year: year, month: month, day: day, calendar: calendar}
+  end
 end
