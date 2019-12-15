@@ -563,4 +563,175 @@ defmodule UTCDateTime do
       ])
     end
   end
+
+  ### ISO 8601 ###
+
+  @doc ~S"""
+  Parses the extended "Date and time of day" format described by
+  [ISO 8601:2004](https://www.iso.org/standard/40874.html).
+
+  Time zone offset may be included in the string but they will be
+  converted to UTC time and stored as such.
+
+  The year parsed by this function is limited to four digits and,
+  while ISO 8601 allows datetimes to specify 24:00:00 as the zero
+  hour of the next day, this notation is not supported by Elixir.
+
+  Note leap seconds are not supported.
+
+  ## Examples
+
+  ```elixir
+  iex> UTCDateTime.from_iso8601("2015-01-23t23:50:07")
+  {:ok, ~Z[2015-01-23 23:50:07]}
+  iex> UTCDateTime.from_iso8601("2015-01-23T23:50:07")
+  {:ok, ~Z[2015-01-23 23:50:07]}
+  iex> UTCDateTime.from_iso8601("2015-01-23 23:50:07")
+  {:ok, ~Z[2015-01-23 23:50:07]}
+  iex> UTCDateTime.from_iso8601("2015-01-23T23:50:07Z")
+  {:ok, ~Z[2015-01-23 23:50:07]}
+  ```
+
+  ```elixir
+  iex> UTCDateTime.from_iso8601("2015-01-23T23:50:07.0")
+  {:ok, ~Z[2015-01-23 23:50:07.0]}
+  iex> UTCDateTime.from_iso8601("2015-01-23T23:50:07,0123456")
+  {:ok, ~Z[2015-01-23 23:50:07.012345]}
+  iex> UTCDateTime.from_iso8601("2015-01-23T23:50:07.0123456")
+  {:ok, ~Z[2015-01-23 23:50:07.012345]}
+  iex> UTCDateTime.from_iso8601("2015-01-23T23:50:07.123Z")
+  {:ok, ~Z[2015-01-23 23:50:07.123]}
+  iex> UTCDateTime.from_iso8601("2016-02-29T23:50:07")
+  {:ok, ~Z[2016-02-29 23:50:07]}
+  ```
+
+  ```elixir
+  iex> UTCDateTime.from_iso8601("2015-01-23P23:50:07")
+  {:error, :invalid_format}
+  iex> UTCDateTime.from_iso8601("2015:01:23 23-50-07")
+  {:error, :invalid_format}
+  iex> UTCDateTime.from_iso8601("2015-01-23 23:50:07A")
+  {:error, :invalid_format}
+  iex> UTCDateTime.from_iso8601("2015-01-23T24:50:07")
+  {:error, :invalid_hour}
+  iex> UTCDateTime.from_iso8601("2015-01-23T23:61:07")
+  {:error, :invalid_minute}
+  iex> UTCDateTime.from_iso8601("2015-01-23T23:50:61")
+  {:error, :invalid_second}
+  iex> UTCDateTime.from_iso8601("2015-13-12T23:50:07")
+  {:error, :invalid_month}
+  iex> UTCDateTime.from_iso8601("2015-01-32T23:50:07")
+  {:error, :invalid_day}
+  iex> UTCDateTime.from_iso8601("2015-02-29T23:50:07")
+  {:error, :invalid_day}
+  ```
+
+  ```elixir
+  iex> UTCDateTime.from_iso8601("2015-01-23T23:50:07.123+02:30")
+  {:ok, ~Z[2015-01-23 21:20:07.123]}
+  iex> UTCDateTime.from_iso8601("2015-01-23T23:50:07.123+00:00")
+  {:ok, ~Z[2015-01-23 23:50:07.123]}
+  iex> UTCDateTime.from_iso8601("2015-01-23T23:50:07.123-02:30")
+  {:ok, ~Z[2015-01-24 02:20:07.123]}
+  ```
+
+  ```elixir
+  iex> UTCDateTime.from_iso8601("2015-01-23T23:50:07.123-00:00")
+  {:error, :invalid_format}
+  iex> UTCDateTime.from_iso8601("2015-01-23T23:50:07.123-00:60")
+  {:error, :invalid_format}
+  iex> UTCDateTime.from_iso8601("2015-01-23T23:50:07.123-24:00")
+  {:error, :invalid_format}
+  ```
+  """
+  @spec from_iso8601(String.t()) ::
+          {:ok, UTCDateTime.t()}
+          | {:error,
+             reason ::
+               :invalid_format
+               | :invalid_month
+               | :invalid_day
+               | :invalid_hour
+               | :invalid_minute
+               | :invalid_second}
+  def from_iso8601(datetime)
+
+  @sep_iso8601 [?T, ?\s, ?t]
+
+  # credo:disable-for-next-line Credo.Check.Refactor.CyclomaticComplexity
+  def from_iso8601(string) do
+    with <<unquote(match_date), sep, unquote(match_time), rest::binary>> <- string,
+         true <- unquote(guard_date) and sep in @sep_iso8601 and unquote(guard_time),
+         {microsec, rest} <- ISO.parse_microsecond(rest),
+         {offset, ""} <- ISO.parse_offset(rest) do
+      {year, month, day} = unquote(read_date)
+      {hour, minute, second} = unquote(read_time)
+
+      cond do
+        month > 12 ->
+          {:error, :invalid_month}
+
+        day > ISO.days_in_month(year, month) ->
+          {:error, :invalid_day}
+
+        hour > 23 ->
+          {:error, :invalid_hour}
+
+        minute > 59 ->
+          {:error, :invalid_minute}
+
+        second > 59 ->
+          {:error, :invalid_second}
+
+        offset == nil or offset == 0 ->
+          {:ok,
+           %__MODULE__{
+             year: year,
+             month: month,
+             day: day,
+             hour: hour,
+             minute: minute,
+             second: second,
+             microsecond: microsec
+           }}
+
+        true ->
+          {year, month, day, hour, minute, second, _microsecond} =
+            year
+            |> ISO.naive_datetime_to_iso_days(month, day, hour, minute, second, {0, 0})
+            |> ISO.add_day_fraction_to_iso_days(-offset, 86_400)
+            |> ISO.naive_datetime_from_iso_days()
+
+          {:ok,
+           %__MODULE__{
+             year: year,
+             month: month,
+             day: day,
+             hour: hour,
+             minute: minute,
+             second: second,
+             microsecond: microsec
+           }}
+      end
+    else
+      _ -> {:error, :invalid_format}
+    end
+  end
+
+  @doc ~S"""
+  Converts the given `utc_datetime` to
+  [ISO 8601:2004](https://www.iso.org/standard/40874.html).
+
+  ## Examples
+
+  ```elixir
+  iex> UTCDateTime.to_iso8601(~Z[2019-12-14 08:06:24.289659])
+  "2019-12-14T08:06:24.289659Z"
+  iex> UTCDateTime.to_iso8601(~Z[2019-12-14 08:06:24])
+  "2019-12-14T08:06:24Z"
+  ```
+  """
+  @spec to_iso8601(t) :: String.t()
+  # RFC3339 is just a profile for ISO8601, so we can just re-use RFC3339
+  def to_iso8601(utc_datetime), do: to_rfc3339(utc_datetime)
 end
