@@ -112,3 +112,10 @@ Additional:
   - `to_local_datetime/1` (in caller)
 - Release 0.0.10
   - `from_human/1` best effort parse
+
+
+## Copyright and License
+
+Copyright (c) 2019, Ian Luites.
+
+UTCDateTime code is licensed under the [MIT License](LICENSE.md).
