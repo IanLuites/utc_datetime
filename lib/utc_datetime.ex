@@ -360,19 +360,21 @@ defmodule UTCDateTime do
 
   ### RFC 3339 ###
 
-  # Very Naive, just for debugging
   import __MODULE__.Utility, only: [pad2: 1, pad4: 1, microsecond: 2]
 
   @doc ~S"""
   Parses the extended "Date and time of day" format described by
-  [RFC3339](https://tools.ietf.org/html/rfc3339).
+  [RFC 3339](https://tools.ietf.org/html/rfc3339).
 
   Time zone offset may be included in the string but they will be
   converted to UTC time and stored as such.
 
   The year parsed by this function is limited to four digits and,
-  while ISO 8601 allows datetimes to specify 24:00:00 as the zero
-  hour of the next day, this notation is not supported by Elixir.
+  while RFC 3339 allows datetimes to specify 24:00:00 as the zero
+  hour of the next day, this notation is not supported.
+
+  Passing `-00:00` as undefined timezone is also not supported and
+  will be interpreted as UTC.
 
   Note leap seconds are not supported.
 
@@ -439,13 +441,23 @@ defmodule UTCDateTime do
   {:error, :invalid_format}
   ```
   """
-  @spec from_rfc3339(String.t()) :: {:ok, UTCDateTime.t()} | {:error, reason :: :invalid_format}
+  @spec from_rfc3339(String.t()) ::
+          {:ok, UTCDateTime.t()}
+          | {:error,
+             reason ::
+               :invalid_format
+               | :invalid_month
+               | :invalid_day
+               | :invalid_hour
+               | :invalid_minute
+               | :invalid_second}
   def from_rfc3339(datetime)
 
   @sep_rfc3339 [?t, ?T]
   [match_date, guard_date, read_date] = Calendar.ISO.__match_date__()
   [match_time, guard_time, read_time] = Calendar.ISO.__match_time__()
 
+  # credo:disable-for-next-line Credo.Check.Refactor.CyclomaticComplexity
   def from_rfc3339(string) do
     with <<unquote(match_date), sep, unquote(match_time), rest::binary>> <- string,
          true <- unquote(guard_date) and sep in @sep_rfc3339 and unquote(guard_time),
