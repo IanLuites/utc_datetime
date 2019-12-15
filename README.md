@@ -110,8 +110,6 @@ Additional:
 - Integrations
   - `:fixtures`
   - `:time_machinex`
-- Release 0.0.4
-  - Benchmarks
 - Release 0.0.5
   - Benchmarks page
   - Ecto Support

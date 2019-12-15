@@ -51,3 +51,17 @@ Benchee.run(
     "Random" => ~N[0716-03-26 13:41:49Z]
   }
 )
+
+# To Date
+Benchee.run(%{
+  "DateTime" => fn -> DateTime.to_date(now_datetime) end,
+  "NaiveDateTime" => fn -> NaiveDateTime.to_date(now_naive_datetime) end,
+  "UTCDateTime" => fn -> UTCDateTime.to_date(now_utc_datetime) end
+})
+
+# To Time
+Benchee.run(%{
+  "DateTime" => fn -> DateTime.to_time(now_datetime) end,
+  "NaiveDateTime" => fn -> NaiveDateTime.to_time(now_naive_datetime) end,
+  "UTCDateTime" => fn -> UTCDateTime.to_time(now_utc_datetime) end
+})
