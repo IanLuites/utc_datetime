@@ -2,6 +2,16 @@
 
 A datetime implementation constraint to UTC.
 
+
+## Goal
+
+The goal is to create datetime type, which unlike `DateTime` guarantees to be
+UTC only, without ignoring the existence of timezones like a `NaiveDateTime`.
+
+A secondary goal is to be more efficient or at least on par with
+the build in datetimes. (`DateTime`, `NaiveDateTime`)
+In practice the goal is to use less memory and
+perform common [shared] actions faster.
 ## Installation
 
 The package can be installed
