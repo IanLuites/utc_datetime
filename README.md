@@ -24,6 +24,12 @@ perform common [shared] actions faster.
 ```elixir
 iex> UTCDateTime.utc_now
 ~Z[2019-12-14 16:08:13.042407]
+
+iex> UTCDateTime.from_rfc3339!("2019-12-14T16:08:13.042407+01:00")
+~Z[2019-12-14 15:08:13.042407]
+
+iex> UTCDateTime.from_iso8601!("2019-12-14 16:08:13.042407")
+~Z[2019-12-14 16:08:13.042407]
 ```
 
 
@@ -87,8 +93,6 @@ Additional:
 - Integrations
   - `:fixtures`
   - `:time_machinex`
-- Release 0.0.2
-  - Benchmarks
 - Release 0.0.3
   - Epochs
 - Release 0.0.4
