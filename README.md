@@ -24,6 +24,12 @@ perform common [shared] actions faster.
 ```elixir
 iex> UTCDateTime.utc_now
 ~Z[2019-12-14 16:08:13.042407]
+
+iex> UTCDateTime.from_rfc3339!("2019-12-14T16:08:13.042407+01:00")
+~Z[2019-12-14 15:08:13.042407]
+
+iex> UTCDateTime.from_iso8601!("2019-12-14 16:08:13.042407")
+~Z[2019-12-14 16:08:13.042407]
 ```
 
 
@@ -51,6 +57,17 @@ Please check back later, because integrations are on the roadmap.
 
 ## Changelog
 
+### v0.0.2 (2019-12-??)
+
+New Features:
+- `~Z` sigil for `UTCDateTime`
+- `from_iso8601/1`, `from_iso8601!/1` ([ISO 8601:2004](https://www.iso.org/standard/40874.html))
+- `from_rfc3339/1`, `from_rfc3339!/1` ([RFC 3339](https://tools.ietf.org/html/rfc3339))
+- `to_iso8601/1` ([ISO 8601:2004](https://www.iso.org/standard/40874.html))
+- `to_rfc3339/1` ([RFC 3339](https://tools.ietf.org/html/rfc3339))
+- `to_string/1` (including `String.Chars` protocol)
+
+
 ### v0.0.1 (2019-12-14)
 
 Base `UTCDateTime`.
@@ -76,20 +93,6 @@ Additional:
 - Integrations
   - `:fixtures`
   - `:time_machinex`
-- Release 0.0.1
-  - Conversions (datetime / naive)
-  - Benchmarks
-  - Changelog
-  - Readme
-  - List Integrations
-  - Roadmap
-- Release 0.0.2
-  - Conversion rfc3339
-  - Sigil
-  - Conversion iso8601
-  - to_string
-  - String parsing
-  - Benchmarks
 - Release 0.0.3
   - Epochs
 - Release 0.0.4
