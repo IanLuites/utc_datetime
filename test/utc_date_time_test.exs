@@ -64,4 +64,12 @@ defmodule UTCDateTimeTest do
       assert UTCDateTime.dump(utc_datetime) == {:ok, datetime}
     end
   end
+
+  describe "Jason" do
+    test "encode" do
+      timestamp = UTCDateTime.utc_now()
+
+      assert Jason.encode!(timestamp) == ~s|"#{timestamp}"|
+    end
+  end
 end

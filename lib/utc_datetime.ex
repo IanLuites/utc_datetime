@@ -1231,4 +1231,14 @@ defmodule UTCDateTime do
     def dump(%__MODULE__{} = datetime), do: {:ok, to_datetime(datetime)}
     def dump(_), do: :error
   end
+
+  ### Jason Integration (Optional) ###
+
+  if Code.ensure_loaded?(Jason) do
+    defimpl Jason.Encoder, for: UTCDateTime do
+      def encode(datetime, opts) do
+        Jason.Encode.string(UTCDateTime.to_rfc3339(datetime), opts)
+      end
+    end
+  end
 end
