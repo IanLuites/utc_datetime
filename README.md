@@ -42,3 +42,25 @@ The docs can be found at [https://hexdocs.pm/utc_datetime](https://hexdocs.pm/ut
 
 Currently `UTCDateTime` does not integrate with other libraries.
 Please check back later, because integrations are on the roadmap.
+
+
+## Changelog
+
+### v0.0.1 (2019-12-14)
+
+Base `UTCDateTime`.
+
+New Features:
+- `from_datetime/1`
+- `from_naive/1`
+- `to_datetime/1`, `to_datetime/2`
+- `to_naive/1`, `to_naive/2`
+- `utc_now/0`
+
+Experimental:
+- `~Z` sigil for `UTCDateTime`
+- [RFC3339](https://tools.ietf.org/html/rfc3339) support
+
+Additional:
+- Benchmarks
+- Roadmap
