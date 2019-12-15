@@ -57,7 +57,13 @@ Please check back later, because integrations are on the roadmap.
 
 ## Changelog
 
-### v0.0.2 (2019-12-??)
+### v0.0.3 (2019-12-15)
+
+New Features:
+- Epochs
+
+
+### v0.0.2 (2019-12-15)
 
 New Features:
 - `~Z` sigil for `UTCDateTime`
@@ -93,8 +99,6 @@ Additional:
 - Integrations
   - `:fixtures`
   - `:time_machinex`
-- Release 0.0.3
-  - Epochs
 - Release 0.0.4
   - Conversions erl/etc
   - `to_date/1`
