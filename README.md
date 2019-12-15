@@ -64,3 +64,51 @@ Experimental:
 Additional:
 - Benchmarks
 - Roadmap
+
+
+## Roadmap
+
+- Integrations
+  - `:fixtures`
+  - `:time_machinex`
+- Release 0.0.1
+  - Conversions (datetime / naive)
+  - Benchmarks
+  - Changelog
+  - Readme
+  - List Integrations
+  - Roadmap
+- Release 0.0.2
+  - Conversion rfc3339
+  - Sigil
+  - Conversion iso8601
+  - to_string
+  - String parsing
+  - Benchmarks
+- Release 0.0.3
+  - Epochs
+- Release 0.0.4
+  - Conversions erl/etc
+  - `to_date/1`
+  - `to_time/1`
+  - `from_date_and_time/2` (optional time)
+  - Benchmarks
+- Release 0.0.5
+  - Benchmarks page
+  - Ecto Support
+  - Benchmarks
+- Release 0.0.6
+  - Jason support
+  - Benchmarks
+- Release 0.0.7
+  - Add / Diff / Truncate
+  - Benchmarks
+- Release 0.0.8
+  - To Unix
+  - To windows
+  - to_epoch(epoch, time_unit)
+  - Benchmarks
+- Release 0.0.9
+  - `to_local_datetime/1` (in caller)
+- Release 0.0.10
+  - `from_human/1` best effort parse
