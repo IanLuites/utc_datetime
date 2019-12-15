@@ -180,6 +180,68 @@ defmodule UTCDateTime do
     end
   end
 
+  @doc ~S"""
+  Compares two `UTCDateTime` structs.
+
+  Returns `:gt` if first (`utc_datetime1`) is later than the second
+  (`utc_datetime2`) and `:lt` for vice versa. If the two `UTCDateTime`
+  are equal `:eq` is returned.
+
+  ## Examples
+
+  ```elixir
+  iex> UTCDateTime.compare(~Z[2016-04-16 13:30:15], ~Z[2016-04-28 16:19:25])
+  :lt
+  iex> UTCDateTime.compare(~Z[2016-04-16 13:30:15.1], ~Z[2016-04-16 13:30:15.01])
+  :gt
+  iex> UTCDateTime.compare(~Z[2016-04-16 13:30:15.654321], ~Z[2016-04-16 13:30:15.654321])
+  :eq
+  ```
+  """
+  @spec compare(t, t) :: :lt | :eq | :gt
+  def compare(utc_datetime1, utc_datetime2)
+
+  def compare(
+        %__MODULE__{
+          year: y1,
+          month: m1,
+          day: d1,
+          hour: h1,
+          minute: min1,
+          second: s1,
+          microsecond: {ms1, _}
+        },
+        %__MODULE__{
+          year: y2,
+          month: m2,
+          day: d2,
+          hour: h2,
+          minute: min2,
+          second: s2,
+          microsecond: {ms2, _}
+        }
+      ) do
+    do_compare([
+      {y1, y2},
+      {m1, m2},
+      {d1, d2},
+      {h1, h2},
+      {min1, min2},
+      {s1, s2},
+      {ms1, ms2}
+    ])
+  end
+
+  defp do_compare([]), do: :eq
+
+  defp do_compare([{a, b} | rest]) do
+    cond do
+      a == b -> do_compare(rest)
+      a < b -> :lt
+      true -> :gt
+    end
+  end
+
   ### Epochs ###
 
   @doc ~S"""
@@ -901,5 +963,237 @@ defmodule UTCDateTime do
         raise ArgumentError,
               "cannot parse #{inspect(datetime)} as UTC datetime, reason: #{inspect(reason)}"
     end
+  end
+
+  ### Erlang ###
+
+  @doc ~S"""
+  Converts a `UTCDateTime` struct to an Erlang datetime tuple.
+
+  WARNING: Loss of precision may occur, as Erlang time tuples only store
+  hour/minute/second and the given `utc_datetime` could contain microsecond
+  precision time data.
+
+  ## Examples
+
+  ```elixir
+  iex> UTCDateTime.to_erl(~Z[2000-01-01 13:30:15])
+  {{2000, 1, 1}, {13, 30, 15}}
+  ```
+  """
+  @spec to_erl(UTCDateTime.t()) :: :calendar.datetime()
+  def to_erl(utc_datetime)
+
+  def to_erl(%__MODULE__{
+        year: year,
+        month: month,
+        day: day,
+        hour: hour,
+        minute: minute,
+        second: second
+      }) do
+    {{year, month, day}, {hour, minute, second}}
+  end
+
+  @doc ~S"""
+  Converts a `erl_datetime` (Erlang datetime tuple) to `UTCDateTime`.
+
+  A tuple of `microsecond` (precision) can additionally be given to
+  extend the datetime.
+
+  ## Examples
+
+  ```elixir
+  iex> UTCDateTime.from_erl({{2000, 1, 1}, {13, 30, 15}})
+  {:ok, ~Z[2000-01-01 13:30:15]}
+
+  iex> UTCDateTime.from_erl({{2000, 1, 1}, {13, 30, 15}}, {5000, 3})
+  {:ok, ~Z[2000-01-01 13:30:15.005]}
+  ```
+
+  ```elixir
+  iex> UTCDateTime.from_erl({{2000, 13, 1}, {13, 30, 15}})
+  {:error, :invalid_month}
+  iex> UTCDateTime.from_erl({{2000, 12, 32}, {13, 30, 15}})
+  {:error, :invalid_day}
+  iex> UTCDateTime.from_erl({{2000, 12, 31}, {25, 30, 15}})
+  {:error, :invalid_hour}
+  iex> UTCDateTime.from_erl({{2000, 12, 31}, {13, 61, 15}})
+  {:error, :invalid_minute}
+  iex> UTCDateTime.from_erl({{2000, 12, 31}, {13, 30, 61}})
+  {:error, :invalid_second}
+  ```
+  """
+  @spec from_erl(:calendar.datetime(), Calendar.microsecond()) ::
+          {:ok, UTCDateTime.t()}
+          | {:error,
+             reason ::
+               :invalid_format
+               | :invalid_month
+               | :invalid_day
+               | :invalid_hour
+               | :invalid_minute
+               | :invalid_second}
+  def from_erl(erl_datetime, microsecond \\ {0, 0})
+
+  # credo:disable-for-next-line Credo.Check.Refactor.CyclomaticComplexity
+  def from_erl({{year, month, day}, {hour, minute, second}}, {us, p} = microsecond) do
+    cond do
+      month > 12 ->
+        {:error, :invalid_month}
+
+      day > ISO.days_in_month(year, month) ->
+        {:error, :invalid_day}
+
+      hour > 23 ->
+        {:error, :invalid_hour}
+
+      minute > 59 ->
+        {:error, :invalid_minute}
+
+      second > 59 ->
+        {:error, :invalid_second}
+
+      us < 0 or us >= 1_000_000 or p < 0 or p > 6 ->
+        {:error, :invalid_second}
+
+      true ->
+        {:ok,
+         %__MODULE__{
+           year: year,
+           month: month,
+           day: day,
+           hour: hour,
+           minute: minute,
+           second: second,
+           microsecond: microsecond
+         }}
+    end
+  end
+
+  @doc ~S"""
+  Converts a `erl_datetime` (Erlang datetime tuple) to `UTCDateTime`.
+
+  Raises if the datetime is invalid.
+
+  A tuple of `microsecond` (precision) can additionally be given to
+  extend the datetime.
+
+  ## Examples
+
+  ```elixir
+  iex> UTCDateTime.from_erl!({{2000, 1, 1}, {13, 30, 15}})
+  ~Z[2000-01-01 13:30:15]
+  iex> UTCDateTime.from_erl!({{2000, 1, 1}, {13, 30, 15}}, {5000, 3})
+  ~Z[2000-01-01 13:30:15.005]
+  iex> UTCDateTime.from_erl!({{2000, 13, 1}, {13, 30, 15}})
+  ** (ArgumentError) cannot convert {{2000, 13, 1}, {13, 30, 15}} to UTC datetime, reason: :invalid_month
+  ```
+  """
+  @spec from_erl!(:calendar.datetime(), Calendar.microsecond()) :: UTCDateTime.t()
+  def from_erl!(erl_datetime, microsecond \\ {0, 0}) do
+    case from_erl(erl_datetime, microsecond) do
+      {:ok, value} ->
+        value
+
+      {:error, reason} ->
+        raise ArgumentError,
+              "cannot convert #{inspect(erl_datetime)} to UTC datetime, reason: #{inspect(reason)}"
+    end
+  end
+
+  ### Date and Time ###
+
+  @doc ~S"""
+  Converts a `UTCDateTime` into a `Date`.
+
+  Because `Date` does not hold time information,
+  data will be lost during the conversion.
+
+  Because the given `utc_datetime` does not contain calendar information,
+  a `calendar` can be given, but will default to `Calendar.ISO`.
+
+  ## Examples
+
+  ``elixir
+  iex> UTCDateTime.to_date(~Z[2002-01-13 23:00:07])
+  ~D[2002-01-13]
+  ```
+  """
+  @spec to_date(UTCDateTime.t(), Calendar.calendar()) :: Date.t()
+  def to_date(utc_datetime, calendar \\ Calendar.ISO)
+
+  def to_date(%UTCDateTime{year: year, month: month, day: day}, calendar) do
+    %Date{year: year, month: month, day: day, calendar: calendar}
+  end
+
+  @doc ~S"""
+  Converts a `UTCDateTime` into `Time`.
+
+  Because `Time` does not hold date information,
+  data will be lost during the conversion.
+
+  Because the given `utc_datetime` does not contain calendar information,
+  a `calendar` can be given, but will default to `Calendar.ISO`.
+
+  ## Examples
+
+  ```elixir
+  iex> UTCDateTime.to_time(~Z[2002-01-13 23:00:07])
+  ~T[23:00:07]
+  ```
+  """
+  @spec to_time(UTCDateTime.t(), Calendar.calendar()) :: Time.t()
+  def to_time(utc_datetime, calendar \\ Calendar.ISO)
+
+  def to_time(
+        %UTCDateTime{hour: hour, minute: minute, second: second, microsecond: microsecond},
+        calendar
+      ) do
+    %Time{
+      hour: hour,
+      minute: minute,
+      second: second,
+      microsecond: microsecond,
+      calendar: calendar
+    }
+  end
+
+  @doc ~S"""
+  Converts a `Date` into `UTCDateTime`.
+
+  Because `Date` does not hold time information,
+  it is possible to supply a `Time` to set on the given `Date`.
+
+  If no `Time` is supplied the `UTCDateTime` will default to: `00:00:00`.
+
+  ## Examples
+
+  ```elixir
+  iex> UTCDateTime.from_date(~D[2002-01-13])
+  ~Z[2002-01-13 00:00:00]
+
+  iex> UTCDateTime.from_date(~D[2002-01-13], ~T[23:00:07])
+  ~Z[2002-01-13 23:00:07]
+  ```
+  """
+  @spec from_date(Date.t(), Time.t()) :: UTCDateTime.t()
+  def from_date(date, time \\ ~T[00:00:00])
+
+  def from_date(%Date{year: year, month: month, day: day}, %Time{
+        hour: hour,
+        minute: minute,
+        second: second,
+        microsecond: microsecond
+      }) do
+    %__MODULE__{
+      year: year,
+      month: month,
+      day: day,
+      hour: hour,
+      minute: minute,
+      second: second,
+      microsecond: microsecond
+    }
   end
 end

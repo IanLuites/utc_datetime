@@ -57,6 +57,17 @@ Please check back later, because integrations are on the roadmap.
 
 ## Changelog
 
+### v0.0.4 (2019-12-??)
+
+New Features:
+- `compare/2`
+- `from_date/2`
+- `from_erl/2`, `from_erl!/2`
+- `to_date/2`
+- `to_erl/1`
+- `to_time/2`
+
+
 ### v0.0.3 (2019-12-15)
 
 New Features:
@@ -99,12 +110,6 @@ Additional:
 - Integrations
   - `:fixtures`
   - `:time_machinex`
-- Release 0.0.4
-  - Conversions erl/etc
-  - `to_date/1`
-  - `to_time/1`
-  - `from_date_and_time/2` (optional time)
-  - Benchmarks
 - Release 0.0.5
   - Benchmarks page
   - Ecto Support
