@@ -51,11 +51,39 @@ The docs can be found at [https://hexdocs.pm/utc_datetime](https://hexdocs.pm/ut
 
 ## Integration
 
-Currently `UTCDateTime` does not integrate with other libraries.
-Please check back later, because integrations are on the roadmap.
+### Ecto
+[![Hex.pm](https://img.shields.io/hexpm/v/ecto.svg "Hex")](https://hex.pm/packages/ecto)
+
+Integrates with [Ecto](https://github.com/elixir-ecto/ecto) as a timestamp type.
+
+Example:
+```
+defmodule User do
+  use Ecto.Schema
+  @timestamps_opts [type: UTCDateTime]
+
+  schema "users" do
+    field :name, :string
+    timestamps()
+  end
+...
+```
+or alternatively
+```
+  schema "users" do
+    field :name, :string
+    timestamps(type: UTCDateTime)
+  end
+```
 
 
 ## Changelog
+
+### v0.0.5 (2019-12-15)
+
+New Features:
+- Ecto type integration.
+
 
 ### v0.0.4 (2019-12-15)
 
@@ -110,10 +138,6 @@ Additional:
 - Integrations
   - `:fixtures`
   - `:time_machinex`
-- Release 0.0.5
-  - Benchmarks page
-  - Ecto Support
-  - Benchmarks
 - Release 0.0.6
   - Jason support
   - Benchmarks
