@@ -1,5 +1,10 @@
 # UTC DateTime
 
+[![Hex.pm](https://img.shields.io/hexpm/v/utc_datetime.svg "Hex")](https://hex.pm/packages/utc_datetime)
+[![Build Status](https://travis-ci.org/IanLuites/utc_datetime.svg?branch=master)](https://travis-ci.org/IanLuites/utc_datetime)
+[![Coverage Status](https://coveralls.io/repos/github/IanLuites/utc_datetime/badge.svg?branch=master)](https://coveralls.io/github/IanLuites/utc_datetime?branch=master)
+[![Hex.pm](https://img.shields.io/hexpm/l/utc_datetime.svg "License")](LICENSE)
+
 A datetime implementation constraint to UTC.
 
 
