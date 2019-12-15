@@ -180,6 +180,68 @@ defmodule UTCDateTime do
     end
   end
 
+  @doc ~S"""
+  Compares two `UTCDateTime` structs.
+
+  Returns `:gt` if first (`utc_datetime1`) is later than the second
+  (`utc_datetime2`) and `:lt` for vice versa. If the two `UTCDateTime`
+  are equal `:eq` is returned.
+
+  ## Examples
+
+  ```elixir
+  iex> UTCDateTime.compare(~Z[2016-04-16 13:30:15], ~Z[2016-04-28 16:19:25])
+  :lt
+  iex> UTCDateTime.compare(~Z[2016-04-16 13:30:15.1], ~Z[2016-04-16 13:30:15.01])
+  :gt
+  iex> UTCDateTime.compare(~Z[2016-04-16 13:30:15.654321], ~Z[2016-04-16 13:30:15.654321])
+  :eq
+  ```
+  """
+  @spec compare(t, t) :: :lt | :eq | :gt
+  def compare(utc_datetime1, utc_datetime2)
+
+  def compare(
+        %__MODULE__{
+          year: y1,
+          month: m1,
+          day: d1,
+          hour: h1,
+          minute: min1,
+          second: s1,
+          microsecond: {ms1, _}
+        },
+        %__MODULE__{
+          year: y2,
+          month: m2,
+          day: d2,
+          hour: h2,
+          minute: min2,
+          second: s2,
+          microsecond: {ms2, _}
+        }
+      ) do
+    do_compare([
+      {y1, y2},
+      {m1, m2},
+      {d1, d2},
+      {h1, h2},
+      {min1, min2},
+      {s1, s2},
+      {ms1, ms2}
+    ])
+  end
+
+  defp do_compare([]), do: :eq
+
+  defp do_compare([{a, b} | rest]) do
+    cond do
+      a == b -> do_compare(rest)
+      a < b -> :lt
+      true -> :gt
+    end
+  end
+
   ### Epochs ###
 
   @doc ~S"""
