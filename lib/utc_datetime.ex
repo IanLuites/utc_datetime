@@ -75,6 +75,10 @@ defmodule UTCDateTime do
     |> Macro.escape()
   end
 
+  defimpl String.Chars do
+    def to_string(utc_datetime), do: UTCDateTime.to_rfc3339(utc_datetime)
+  end
+
   defimpl Inspect do
     import UTCDateTime.Utility, only: [pad2: 1, pad4: 1, microsecond: 2]
 
@@ -155,6 +159,24 @@ defmodule UTCDateTime do
       microsecond: microsecond
     }
   end
+
+  @doc ~S"""
+  Converts the given `utc_datetime` to a string using the format
+  defined by [RFC 3339](https://tools.ietf.org/html/rfc3339).
+
+  For more examples see: `to_rfc3339/1`.
+
+  ### Examples
+
+  ```elixir
+  iex> UTCDateTime.to_string(~Z[2000-02-28 23:00:13])
+  "2000-02-28T23:00:13Z"
+  iex> UTCDateTime.to_string(~Z[2000-02-28 23:00:13.001])
+  "2000-02-28T23:00:13.001Z"
+  ```
+  """
+  @spec to_string(UTCDateTime.t()) :: String.t()
+  def to_string(utc_datetime), do: UTCDateTime.to_rfc3339(utc_datetime)
 
   ### DateTime ###
 

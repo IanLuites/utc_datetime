@@ -7,3 +7,15 @@ Benchee.run(%{
   "NaiveDateTime" => fn -> inspect(now_naive_datetime) end,
   "UTCDateTime" => fn -> inspect(now_utc_datetime) end
 })
+
+Benchee.run(%{
+  "DateTime" => fn -> to_string(now_datetime) end,
+  "NaiveDateTime" => fn -> to_string(now_naive_datetime) end,
+  "UTCDateTime" => fn -> to_string(now_utc_datetime) end
+})
+
+Benchee.run(%{
+  "DateTime" => fn -> DateTime.to_string(now_datetime) end,
+  "NaiveDateTime" => fn -> NaiveDateTime.to_string(now_naive_datetime) end,
+  "UTCDateTime" => fn -> UTCDateTime.to_string(now_utc_datetime) end
+})
