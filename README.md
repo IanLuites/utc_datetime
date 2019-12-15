@@ -57,7 +57,7 @@ Please check back later, because integrations are on the roadmap.
 
 ## Changelog
 
-### v0.0.4 (2019-12-??)
+### v0.0.4 (2019-12-15)
 
 New Features:
 - `compare/2`
