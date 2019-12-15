@@ -61,7 +61,7 @@ Please check back later, because integrations are on the roadmap.
 
 New Features:
 - `compare/2`
-- `from_erl/1`
+- `from_erl/2`, `from_erl!/2`
 - `to_erl/1`
 
 
