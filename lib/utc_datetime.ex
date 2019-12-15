@@ -746,4 +746,68 @@ defmodule UTCDateTime do
   @spec to_iso8601(t) :: String.t()
   # RFC3339 is just a profile for ISO8601, so we can just re-use RFC3339
   def to_iso8601(utc_datetime), do: to_rfc3339(utc_datetime)
+
+  ### Bangs ###
+
+  @doc ~S"""
+  Parses the extended "Date and time of day" format described by
+  [RFC 3339](https://tools.ietf.org/html/rfc3339).
+
+  Raises if the format is invalid.
+
+  For more examples see: `from_rfc3339/1`.
+
+  ## Examples
+
+  ```elixir
+  iex> UTCDateTime.from_rfc3339!("2015-01-23T23:50:07.123Z")
+  ~Z[2015-01-23 23:50:07.123]
+  iex> UTCDateTime.from_rfc3339!("2015-01-23T23:50:07,123Z")
+  ~Z[2015-01-23 23:50:07.123]
+  iex> UTCDateTime.from_rfc3339!("2015-01-23P23:50:07")
+  ** (ArgumentError) cannot parse "2015-01-23P23:50:07" as UTC datetime, reason: :invalid_format
+  ```
+  """
+  @spec from_rfc3339!(String.t()) :: UTCDateTime.t() | no_return
+  def from_rfc3339!(datetime) do
+    case from_rfc3339(datetime) do
+      {:ok, value} ->
+        value
+
+      {:error, reason} ->
+        raise ArgumentError,
+              "cannot parse #{inspect(datetime)} as UTC datetime, reason: #{inspect(reason)}"
+    end
+  end
+
+  @doc ~S"""
+  Parses the extended "Date and time of day" format described by
+  [ISO 8601:2004](https://www.iso.org/standard/40874.html).
+
+  Raises if the format is invalid.
+
+  For more examples see: `from_iso8601/1`.
+
+  ## Examples
+
+  ```elixir
+  iex> UTCDateTime.from_iso8601!("2015-01-23T23:50:07.123Z")
+  ~Z[2015-01-23 23:50:07.123]
+  iex> UTCDateTime.from_iso8601!("2015-01-23T23:50:07,123Z")
+  ~Z[2015-01-23 23:50:07.123]
+  iex> UTCDateTime.from_iso8601!("2015-01-23P23:50:07")
+  ** (ArgumentError) cannot parse "2015-01-23P23:50:07" as UTC datetime, reason: :invalid_format
+  ```
+  """
+  @spec from_iso8601!(String.t()) :: UTCDateTime.t() | no_return
+  def from_iso8601!(datetime) do
+    case from_iso8601(datetime) do
+      {:ok, value} ->
+        value
+
+      {:error, reason} ->
+        raise ArgumentError,
+              "cannot parse #{inspect(datetime)} as UTC datetime, reason: #{inspect(reason)}"
+    end
+  end
 end
