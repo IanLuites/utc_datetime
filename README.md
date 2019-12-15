@@ -54,8 +54,10 @@ Please check back later, because integrations are on the roadmap.
 ### v0.0.2 (2019-12-??)
 
 New Features:
-- `from_rfc3339/1` ([RFC3339](https://tools.ietf.org/html/rfc3339))
-- `to_rfc3339/1` ([RFC3339](https://tools.ietf.org/html/rfc3339))
+- `from_iso8601/1`, `from_iso8601!/1` ([ISO 8601:2004](https://www.iso.org/standard/40874.html))
+- `from_rfc3339/1`, `from_rfc3339!/1` ([RFC 3339](https://tools.ietf.org/html/rfc3339))
+- `to_iso8601/1` ([ISO 8601:2004](https://www.iso.org/standard/40874.html))
+- `to_rfc3339/1` ([RFC 3339](https://tools.ietf.org/html/rfc3339))
 
 
 ### v0.0.1 (2019-12-14)
@@ -84,7 +86,6 @@ Additional:
   - `:fixtures`
   - `:time_machinex`
 - Release 0.0.2
-  - Conversion iso8601
   - Sigil
   - to_string
   - String parsing
