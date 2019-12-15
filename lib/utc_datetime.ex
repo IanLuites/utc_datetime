@@ -964,4 +964,58 @@ defmodule UTCDateTime do
               "cannot parse #{inspect(datetime)} as UTC datetime, reason: #{inspect(reason)}"
     end
   end
+
+  ### Erlang ###
+
+  @doc ~S"""
+  Converts a `UTCDateTime` struct to an Erlang datetime tuple.
+
+  WARNING: Loss of precision may occur, as Erlang time tuples only store
+  hour/minute/second and the given `utc_datetime` could contain microsecond
+  precision time data.
+
+  ## Examples
+
+  ```elixir
+  iex> UTCDateTime.to_erl(~Z[2000-01-01 13:30:15])
+  {{2000, 1, 1}, {13, 30, 15}}
+  ```
+  """
+  @spec to_erl(UTCDateTime.t()) :: :calendar.datetime()
+  def to_erl(utc_datetime)
+
+  def to_erl(%__MODULE__{
+        year: year,
+        month: month,
+        day: day,
+        hour: hour,
+        minute: minute,
+        second: second
+      }) do
+    {{year, month, day}, {hour, minute, second}}
+  end
+
+  @doc ~S"""
+  Converts a `erl_datetime` (Erlang datetime tuple) to `UTCDateTime`.
+
+  ## Examples
+
+  ```elixir
+  iex> UTCDateTime.from_erl({{2000, 1, 1}, {13, 30, 15}})
+  ~Z[2000-01-01 13:30:15]
+  ```
+  """
+  @spec from_erl(:calendar.datetime()) :: UTCDateTime.t()
+  def from_erl(erl_datetime)
+
+  def from_erl({{year, month, day}, {hour, minute, second}}) do
+    %__MODULE__{
+      year: year,
+      month: month,
+      day: day,
+      hour: hour,
+      minute: minute,
+      second: second
+    }
+  end
 end
