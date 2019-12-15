@@ -2,6 +2,7 @@ defmodule UTCDateTime do
   @moduledoc ~S"""
   A datetime implementation constraint to UTC.
   """
+  alias Calendar.ISO
 
   @enforce_keys [:year, :month, :day, :hour, :minute, :second]
   defstruct [
@@ -27,6 +28,7 @@ defmodule UTCDateTime do
 
   ### Sigil ###
 
+  @doc @moduledoc
   defmacro __using__(_opts \\ []) do
     quote do
       require unquote(__MODULE__)
@@ -96,6 +98,128 @@ defmodule UTCDateTime do
   def utc_now do
     {:ok, {year, month, day}, {hour, minute, second}, microsecond} =
       Calendar.ISO.from_unix(:os.system_time(), :native)
+
+    %__MODULE__{
+      year: year,
+      month: month,
+      day: day,
+      hour: hour,
+      minute: minute,
+      second: second,
+      microsecond: microsecond
+    }
+  end
+
+  ### DateTime ###
+
+  @doc ~S"""
+  Converts the given `UTCDateTime` to `NaiveDateTime`.
+
+  The given `utc_datetime` does not contain a calendar,
+  so `Calendar.ISO` is set by default.
+  It is possible to manually pass a different calendar.
+
+  ## Examples
+
+  ```elixir
+  iex> UTCDateTime.to_datetime(~Z[2016-05-24 13:26:08.003])
+  ~U[2016-05-24 13:26:08.003Z]
+  """
+  @spec to_datetime(UTCDateTime.t(), Calendar.calendar()) :: DateTime.t()
+  def to_datetime(utc_datetime, calendar \\ Calendar.ISO)
+
+  def to_datetime(
+        %__MODULE__{
+          year: year,
+          month: month,
+          day: day,
+          hour: hour,
+          minute: minute,
+          second: second,
+          microsecond: microsecond
+        },
+        calendar
+      ) do
+    %DateTime{
+      year: year,
+      month: month,
+      day: day,
+      calendar: calendar,
+      hour: hour,
+      minute: minute,
+      second: second,
+      microsecond: microsecond,
+      std_offset: 0,
+      time_zone: "Etc/UTC",
+      utc_offset: 0,
+      zone_abbr: "UTC"
+    }
+  end
+
+  @doc ~S"""
+  Converts the given `datetime` into a `UTCDateTime`.
+
+  Any `datetime` with a none UTC time zone will be converted to UTC.
+
+  ## Examples
+
+  ```elixir
+  iex> dt = %DateTime{year: 2000, month: 2, day: 29, zone_abbr: "UTC",
+  ...>                hour: 23, minute: 0, second: 7, microsecond: {0, 1},
+  ...>                utc_offset: 0, std_offset: 0, time_zone: "Etc/UTC"}
+  iex> UTCDateTime.from_datetime(dt)
+  ~Z[2000-02-29 23:00:07.0]
+  ```
+
+  ```elixir
+  iex> dt = %DateTime{year: 2000, month: 2, day: 29, zone_abbr: "CET",
+  ...>                hour: 23, minute: 0, second: 7, microsecond: {0, 1},
+  ...>                utc_offset: 3600, std_offset: 0, time_zone: "Europe/Warsaw"}
+  iex> UTCDateTime.from_datetime(dt)
+  ~Z[2000-02-29 22:00:07.0]
+  ```
+  """
+  @spec from_datetime(DateTime.t()) :: UTCDateTime.t()
+  def from_datetime(datetime)
+
+  def from_datetime(%DateTime{
+        year: year,
+        month: month,
+        day: day,
+        hour: hour,
+        minute: minute,
+        second: second,
+        microsecond: microsecond,
+        std_offset: 0,
+        utc_offset: 0
+      }),
+      do: %__MODULE__{
+        year: year,
+        month: month,
+        day: day,
+        hour: hour,
+        minute: minute,
+        second: second,
+        microsecond: microsecond
+      }
+
+  def from_datetime(%DateTime{
+        calendar: calendar,
+        year: year,
+        month: month,
+        day: day,
+        hour: hour,
+        minute: minute,
+        second: second,
+        microsecond: microsecond,
+        std_offset: std_offset,
+        utc_offset: utc_offset
+      }) do
+    {year, month, day, hour, minute, second, _microsecond} =
+      year
+      |> calendar.naive_datetime_to_iso_days(month, day, hour, minute, second, microsecond)
+      |> ISO.add_day_fraction_to_iso_days(-(utc_offset + std_offset), 86_400)
+      |> ISO.naive_datetime_from_iso_days()
 
     %__MODULE__{
       year: year,
