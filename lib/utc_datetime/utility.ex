@@ -38,11 +38,5 @@ defmodule UTCDateTime.Utility do
 
   @doc false
   @spec microsecond(non_neg_integer, pos_integer) :: String.t()
-  def microsecond(us, precision)
-  def microsecond(us, 1), do: "." <> binary_part(to_string(us), 0, 1)
-  def microsecond(us, 2), do: "." <> binary_part(pad2(us), 0, 2)
-  def microsecond(us, 3), do: "." <> binary_part(pad3(us), 0, 3)
-  def microsecond(us, 4), do: "." <> binary_part(pad4(us), 0, 4)
-  def microsecond(us, 5), do: "." <> binary_part(pad5(us), 0, 5)
-  def microsecond(us, 6), do: pad6_us(us)
+  def microsecond(us, precision), do: binary_part(pad6_us(us), 0, precision + 1)
 end
