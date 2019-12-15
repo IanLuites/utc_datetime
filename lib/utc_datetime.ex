@@ -26,9 +26,58 @@ defmodule UTCDateTime do
           microsecond: Calendar.microsecond()
         }
 
+  @epochs_docs ~S"""
+  | Epoch | Date | Aliases |
+  |-|-|-|
+  | `:go` | 0001-01-01 | `:dotnet`, `:rata_die`, `:rexx` |
+  | `:uuid` | 1582-10-15 | |
+  | `:win` | 1601-01-01 | `:win_nt`, `:win32`, `:cobol`, `:ntfs` |
+  | `:mumps` | 1840-12-31 | |
+  | `:vms` | 1858-11-17 | `:vms`, `:usno`, `:dvb`, `:mjd` |
+  | `:pascal` | 1899-12-30 | `:ms_com`, `:libre_office_calc`, `:google_sheets` |
+  | `:ms_c` | 1899-12-31 | `:dyalog_alp` |
+  | `:ms_excel` | 1900-01-00 | `:ms_excel`, `:lotus` |
+  | `:unix` | 1970-01-01 | `:posix` |
+  """
+
+  @typedoc """
+  Common datetime epochs.
+
+  ## Epochs
+
+  #{@epochs_docs}
+  """
+  @type epoch ::
+          :cobol
+          | :dotnet
+          | :dvb
+          | :dyalog_alp
+          | :go
+          | :google_sheets
+          | :libre_office_calc
+          | :lotus
+          | :mjd
+          | :ms_c
+          | :ms_com
+          | :ms_excel
+          | :mumps
+          | :ntfs
+          | :pascal
+          | :posix
+          | :rata_die
+          | :rexx
+          | :unix
+          | :usno
+          | :uuid
+          | :vms
+          | :win
+          | :win32
+          | :win64
+          | :win_nt
+
   ### Sigil ###
 
-  @doc @moduledoc
+  @doc false
   defmacro __using__(_opts \\ []) do
     quote do
       require unquote(__MODULE__)
@@ -177,6 +226,29 @@ defmodule UTCDateTime do
   """
   @spec to_string(UTCDateTime.t()) :: String.t()
   def to_string(utc_datetime), do: UTCDateTime.to_rfc3339(utc_datetime)
+
+  @doc """
+  A `UTCDateTime` representing the given `epoch`.
+
+  ## Epochs
+
+  #{@epochs_docs}
+
+  ## Examples
+
+  ```elixir
+  iex> UTCDateTime.epoch(:unix)
+  ~Z[1970-01-01 00:00:00]
+
+  iex> UTCDateTime.epoch(:win)
+  ~Z[1601-01-01 00:00:00]
+
+  iex> UTCDateTime.epoch(:go)
+  ~Z[0001-01-01 00:00:00]
+  ```
+  """
+  @spec epoch(epoch :: epoch) :: t | no_return
+  def epoch(epoch), do: __MODULE__.Epochs.epoch(epoch)
 
   ### DateTime ###
 
