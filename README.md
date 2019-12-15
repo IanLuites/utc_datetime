@@ -36,3 +36,9 @@ end
 ```
 
 The docs can be found at [https://hexdocs.pm/utc_datetime](https://hexdocs.pm/utc_datetime).
+
+
+## Integration
+
+Currently `UTCDateTime` does not integrate with other libraries.
+Please check back later, because integrations are on the roadmap.
