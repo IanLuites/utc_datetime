@@ -61,6 +61,7 @@ Please check back later, because integrations are on the roadmap.
 
 New Features:
 - `compare/2`
+- `from_date/2`
 - `from_erl/2`, `from_erl!/2`
 - `to_date/2`
 - `to_erl/1`
@@ -110,7 +111,6 @@ Additional:
   - `:fixtures`
   - `:time_machinex`
 - Release 0.0.4
-  - `from_date_and_time/2` (optional time)
   - Benchmarks
 - Release 0.0.5
   - Benchmarks page

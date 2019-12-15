@@ -1145,4 +1145,42 @@ defmodule UTCDateTime do
       calendar: calendar
     }
   end
+
+  @doc ~S"""
+  Converts a `Date` into `UTCDateTime`.
+
+  Because `Date` does not hold time information,
+  it is possible to supply a `Time` to set on the given `Date`.
+
+  If no `Time` is supplied the `UTCDateTime` will default to: `00:00:00`.
+
+  ## Examples
+
+  ```elixir
+  iex> UTCDateTime.from_date(~D[2002-01-13])
+  ~Z[2002-01-13 00:00:00]
+
+  iex> UTCDateTime.from_date(~D[2002-01-13], ~T[23:00:07])
+  ~Z[2002-01-13 23:00:07]
+  ```
+  """
+  @spec from_date(Date.t(), Time.t()) :: UTCDateTime.t()
+  def from_date(date, time \\ ~T[00:00:00])
+
+  def from_date(%Date{year: year, month: month, day: day}, %Time{
+        hour: hour,
+        minute: minute,
+        second: second,
+        microsecond: microsecond
+      }) do
+    %__MODULE__{
+      year: year,
+      month: month,
+      day: day,
+      hour: hour,
+      minute: minute,
+      second: second,
+      microsecond: microsecond
+    }
+  end
 end
