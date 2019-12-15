@@ -78,7 +78,55 @@ defmodule UTCDateTime do
   end
 
   defimpl Inspect do
-    def inspect(utc_datetime, _), do: "~Z[" <> UTCDateTime.to_rfc3339(utc_datetime) <> "]"
+    import UTCDateTime.Utility, only: [pad2: 1, pad4: 1, microsecond: 2]
+
+    def inspect(
+          %UTCDateTime{
+            year: year,
+            month: month,
+            day: day,
+            hour: hour,
+            minute: minute,
+            second: second,
+            microsecond: {microsecond, precision}
+          },
+          _
+        ) do
+      if precision == 0 do
+        :erlang.iolist_to_binary([
+          "~Z[",
+          pad4(year),
+          "-",
+          pad2(month),
+          "-",
+          pad2(day),
+          " ",
+          pad2(hour),
+          ":",
+          pad2(minute),
+          ":",
+          pad2(second),
+          "]"
+        ])
+      else
+        :erlang.iolist_to_binary([
+          "~Z[",
+          pad4(year),
+          "-",
+          pad2(month),
+          "-",
+          pad2(day),
+          " ",
+          pad2(hour),
+          ":",
+          pad2(minute),
+          ":",
+          pad2(second),
+          microsecond(microsecond, precision),
+          "]"
+        ])
+      end
+    end
   end
 
   ### Epochs ###
