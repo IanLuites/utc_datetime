@@ -998,6 +998,9 @@ defmodule UTCDateTime do
   @doc ~S"""
   Converts a `erl_datetime` (Erlang datetime tuple) to `UTCDateTime`.
 
+  A tuple of `microsecond` (precision) can additionally be given to
+  extend the datetime.
+
   ## Examples
 
   ```elixir
@@ -1033,6 +1036,7 @@ defmodule UTCDateTime do
                | :invalid_second}
   def from_erl(erl_datetime, microsecond \\ {0, 0})
 
+  # credo:disable-for-next-line Credo.Check.Refactor.CyclomaticComplexity
   def from_erl({{year, month, day}, {hour, minute, second}}, {us, p} = microsecond) do
     cond do
       month > 12 ->
@@ -1072,6 +1076,9 @@ defmodule UTCDateTime do
 
   Raises if the datetime is invalid.
 
+  A tuple of `microsecond` (precision) can additionally be given to
+  extend the datetime.
+
   ## Examples
 
   ```elixir
@@ -1084,14 +1091,14 @@ defmodule UTCDateTime do
   ```
   """
   @spec from_erl!(:calendar.datetime(), Calendar.microsecond()) :: UTCDateTime.t()
-  def from_erl!(tuple, microsecond \\ {0, 0}) do
-    case from_erl(tuple, microsecond) do
+  def from_erl!(erl_datetime, microsecond \\ {0, 0}) do
+    case from_erl(erl_datetime, microsecond) do
       {:ok, value} ->
         value
 
       {:error, reason} ->
         raise ArgumentError,
-              "cannot convert #{inspect(tuple)} to UTC datetime, reason: #{inspect(reason)}"
+              "cannot convert #{inspect(erl_datetime)} to UTC datetime, reason: #{inspect(reason)}"
     end
   end
 
@@ -1102,6 +1109,9 @@ defmodule UTCDateTime do
 
   Because `Date` does not hold time information,
   data will be lost during the conversion.
+
+  Because the given `utc_datetime` does not contain calendar information,
+  a `calendar` can be given, but will default to `Calendar.ISO`.
 
   ## Examples
 
@@ -1122,6 +1132,9 @@ defmodule UTCDateTime do
 
   Because `Time` does not hold date information,
   data will be lost during the conversion.
+
+  Because the given `utc_datetime` does not contain calendar information,
+  a `calendar` can be given, but will default to `Calendar.ISO`.
 
   ## Examples
 
