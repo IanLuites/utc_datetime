@@ -51,6 +51,13 @@ Please check back later, because integrations are on the roadmap.
 
 ## Changelog
 
+### v0.0.2 (2019-12-??)
+
+New Features:
+- `from_rfc3339/1` ([RFC3339](https://tools.ietf.org/html/rfc3339))
+- `to_rfc3339/1` ([RFC3339](https://tools.ietf.org/html/rfc3339))
+
+
 ### v0.0.1 (2019-12-14)
 
 Base `UTCDateTime`.
@@ -77,9 +84,8 @@ Additional:
   - `:fixtures`
   - `:time_machinex`
 - Release 0.0.2
-  - Conversion rfc3339
-  - Sigil
   - Conversion iso8601
+  - Sigil
   - to_string
   - String parsing
   - Benchmarks
