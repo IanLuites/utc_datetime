@@ -57,7 +57,7 @@ defmodule UTCDateTime.MixProject do
   end
 
   def application do
-    [extra_applications: [:ecto, :jason, :logger]]
+    [extra_applications: [:logger]]
   end
 
   defp deps do

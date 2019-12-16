@@ -1200,7 +1200,7 @@ defmodule UTCDateTime do
   ### Ecto Integration (Optional) ###
 
   if Code.ensure_loaded?(Ecto.Type) do
-    use Ecto.Type
+    @behaviour Ecto.Type
 
     @impl Ecto.Type
     @spec embed_as(term) :: :self
