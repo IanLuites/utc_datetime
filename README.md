@@ -158,9 +158,6 @@ Additional:
 - Integrations
   - `:fixtures`
   - `:time_machinex`
-- Release 0.0.6
-  - Jason support
-  - Benchmarks
 - Release 0.0.7
   - Add / Diff / Truncate
   - Benchmarks
