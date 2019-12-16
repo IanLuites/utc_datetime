@@ -1197,6 +1197,33 @@ defmodule UTCDateTime do
     }
   end
 
+  ### Truncate / Add / Diff ###
+
+  @doc ~S"""
+  Returns the given `utc_datetime` with the microsecond field truncated to the
+  given precision (`:microsecond`, `:millisecond` or `:second`).
+
+  The given naive datetime is returned unchanged if it already has lower precision
+  than the given precision.
+
+  ## Examples
+
+  ```elixir
+  iex> UTCDateTime.truncate(~Z[2017-11-06 00:23:51.123456], :microsecond)
+  ~Z[2017-11-06 00:23:51.123456]
+  iex> UTCDateTime.truncate(~Z[2017-11-06 00:23:51.123456], :millisecond)
+  ~Z[2017-11-06 00:23:51.123]
+  iex> UTCDateTime.truncate(~Z[2017-11-06 00:23:51.123456], :second)
+  ~Z[2017-11-06 00:23:51]
+  ```
+  """
+  @spec truncate(UTCDateTime.t(), :microsecond | :millisecond | :second) :: UTCDateTime.t()
+  def truncate(utc_datetime, precision)
+
+  def truncate(%UTCDateTime{microsecond: microsecond} = utc_datetime, precision) do
+    %{utc_datetime | microsecond: Calendar.truncate(microsecond, precision)}
+  end
+
   ### Ecto Integration (Optional) ###
 
   if Code.ensure_loaded?(Ecto.Type) do
