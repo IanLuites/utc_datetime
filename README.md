@@ -93,7 +93,7 @@ iex> Jason.encode!(%{created_at: ~Z[2019-12-16 00:00:12.068421]})
 
 ## Changelog
 
-### v0.0.9 (2019-12-??)
+### v0.0.7 (2019-12-16)
 
 New Features:
 - `truncate/2`
@@ -164,17 +164,17 @@ Additional:
 - Integrations
   - `:fixtures`
   - `:time_machinex`
-- Release 0.0.7
+- Release 0.0.8
   - Add / Diff
   - Benchmarks
-- Release 0.0.8
+- Release 0.0.9
   - To Unix
   - To windows
   - to_epoch(epoch, time_unit)
   - Benchmarks
-- Release 0.0.9
-  - `to_local_datetime/1` (in caller)
 - Release 0.0.10
+  - `to_local_datetime/1` (in caller)
+- Release 0.0.11
   - `from_human/1` best effort parse
 
 
