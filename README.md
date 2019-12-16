@@ -57,7 +57,7 @@ The docs can be found at [https://hexdocs.pm/utc_datetime](https://hexdocs.pm/ut
 Integrates with [Ecto](https://github.com/elixir-ecto/ecto) as a timestamp type.
 
 Example:
-```
+```elixir
 defmodule User do
   use Ecto.Schema
   @timestamps_opts [type: UTCDateTime]
@@ -69,7 +69,7 @@ defmodule User do
 ...
 ```
 or alternatively
-```
+```elixir
   schema "users" do
     field :name, :string
     timestamps(type: UTCDateTime)
@@ -77,7 +77,27 @@ or alternatively
 ```
 
 
+### Jason
+[![Hex.pm](https://img.shields.io/hexpm/v/jason.svg "Hex")](https://hex.pm/packages/jason)
+
+Integrates with [Jason](https://github.com/michalmuskala/jason) and
+supports out of the box encoding almost twice as fast as the build in `DateTime`
+and `NaiveDateTime`.
+
+Example:
+```elixir
+iex> Jason.encode!(%{created_at: ~Z[2019-12-16 00:00:12.068421]})
+"{\"created_at\":\"2019-12-16T00:00:12.068421Z\"}"
+```
+
+
 ## Changelog
+
+### v0.0.6 (2019-12-15)
+
+New Features:
+- Jason [encoding] integration.
+
 
 ### v0.0.5 (2019-12-15)
 
