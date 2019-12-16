@@ -93,6 +93,12 @@ iex> Jason.encode!(%{created_at: ~Z[2019-12-16 00:00:12.068421]})
 
 ## Changelog
 
+### v0.0.9 (2019-12-??)
+
+New Features:
+- `truncate/2`
+
+
 ### v0.0.6 (2019-12-15)
 
 New Features:
@@ -159,7 +165,7 @@ Additional:
   - `:fixtures`
   - `:time_machinex`
 - Release 0.0.7
-  - Add / Diff / Truncate
+  - Add / Diff
   - Benchmarks
 - Release 0.0.8
   - To Unix
