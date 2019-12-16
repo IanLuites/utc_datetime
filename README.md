@@ -41,7 +41,7 @@ by adding `utc_datetime` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:utc_datetime, "~> 0.0.5"}
+    {:utc_datetime, "~> 0.0.6"}
   ]
 end
 ```
