@@ -1219,9 +1219,11 @@ defmodule UTCDateTime do
   """
   @spec truncate(UTCDateTime.t(), :microsecond | :millisecond | :second) :: UTCDateTime.t()
   def truncate(utc_datetime, precision)
+  def truncate(%UTCDateTime{} = utc_datetime, :microsecond), do: utc_datetime
+  def truncate(%UTCDateTime{} = utc_datetime, :second), do: %{utc_datetime | microsecond: {0, 0}}
 
-  def truncate(%UTCDateTime{microsecond: microsecond} = utc_datetime, precision) do
-    %{utc_datetime | microsecond: Calendar.truncate(microsecond, precision)}
+  def truncate(%UTCDateTime{microsecond: {microsecond, precision}} = utc_datetime, :millisecond) do
+    %{utc_datetime | microsecond: {div(microsecond, 1000) * 1000, min(precision, 3)}}
   end
 
   ### Ecto Integration (Optional) ###

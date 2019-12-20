@@ -93,6 +93,14 @@ iex> Jason.encode!(%{created_at: ~Z[2019-12-16 00:00:12.068421]})
 
 ## Changelog
 
+### v0.0.8 (2019-12-??)
+
+New Features:
+
+Cleanup:
+- `truncate/2`
+
+
 ### v0.0.7 (2019-12-16)
 
 New Features:
