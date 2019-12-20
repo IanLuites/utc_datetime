@@ -824,6 +824,13 @@ defmodule UTCDateTime do
 
   @sep_iso8601 [?T, ?\s, ?t]
 
+  def from_iso8601(string)
+
+  def from_iso8601("-" <> string) do
+    with {:ok, utc_datetime = %{year: y}} <- from_iso8601(string),
+         do: {:ok, %{utc_datetime | year: -y}}
+  end
+
   # credo:disable-for-next-line Credo.Check.Refactor.CyclomaticComplexity
   def from_iso8601(string) do
     with <<unquote(match_date), sep, unquote(match_time), rest::binary>> <- string,
@@ -1198,6 +1205,153 @@ defmodule UTCDateTime do
   end
 
   ### Truncate / Add / Diff ###
+
+  @doc ~S"""
+  Adds a specified amount of time to a `UTCDateTime`.
+
+  Accepts an `amount_to_add` in any `unit` available from `t:System.time_unit/0`.
+
+  Negative values will move the `utc_datetime` backwards in time.
+
+  ## Examples
+
+  ```elixir
+  # adds seconds by default
+  iex> UTCDateTime.add(~Z[2014-10-02 00:29:10], 2)
+  ~Z[2014-10-02 00:29:12]
+  ```
+
+  ```elixir
+  # accepts negative offsets
+  iex> UTCDateTime.add(~Z[2014-10-02 00:29:10], -2)
+  ~Z[2014-10-02 00:29:08]
+  ```
+
+  ```elixir
+  # can work with other units
+  iex> UTCDateTime.add(~Z[2014-10-02 00:29:10], 2_000, :millisecond)
+  ~Z[2014-10-02 00:29:12]
+  ```
+
+  ```elixir
+  # keeps the same precision
+  iex> UTCDateTime.add(~Z[2014-10-02 00:29:10.021], 21, :second)
+  ~Z[2014-10-02 00:29:31.021]
+  ```
+
+  ```elixir
+  # changes below the precision will not be visible
+  iex> hidden = UTCDateTime.add(~Z[2014-10-02 00:29:10], 21, :millisecond)
+  iex> hidden.microsecond # ~Z[2014-10-02 00:29:10]
+  {21000, 0}
+  ```
+
+  ```elixir
+  # from Gregorian seconds
+  iex> UTCDateTime.add(~Z[0000-01-01 00:00:00], 63_579_428_950)
+  ~Z[2014-10-02 00:29:10]
+  ```
+  """
+  @spec add(UTCDateTime.t(), integer, System.time_unit()) :: UTCDateTime.t()
+  def add(utc_datetime, amount_to_add, unit \\ :second)
+
+  def add(
+        %__MODULE__{
+          year: year,
+          month: month,
+          day: day,
+          hour: hour,
+          minute: minute,
+          second: second,
+          microsecond: microsecond = {_, precision}
+        },
+        amount_to_add,
+        unit
+      ) do
+    ppd = System.convert_time_unit(86_400, :second, unit)
+
+    {year, month, day, hour, minute, second, {microsecond, _}} =
+      year
+      |> ISO.naive_datetime_to_iso_days(month, day, hour, minute, second, microsecond)
+      |> ISO.add_day_fraction_to_iso_days(amount_to_add, ppd)
+      |> ISO.naive_datetime_from_iso_days()
+
+    %__MODULE__{
+      year: year,
+      month: month,
+      day: day,
+      hour: hour,
+      minute: minute,
+      second: second,
+      microsecond: {microsecond, precision}
+    }
+  end
+
+  @doc ~S"""
+  Subtracts `utc_datetime1` from `utc_datetime2`.
+
+  The answer can be returned in any `unit` available from `t:System.time_unit/0`.
+
+  This function returns the difference in seconds where seconds are measured
+  according to `Calendar.ISO`.
+
+  ## Examples
+
+  ```elixir
+  iex> UTCDateTime.diff(~Z[2014-10-02 00:29:12], ~Z[2014-10-02 00:29:10])
+  2
+  iex> UTCDateTime.diff(~Z[2014-10-02 00:29:12], ~Z[2014-10-02 00:29:10], :microsecond)
+  2_000_000
+  iex> UTCDateTime.diff(~Z[2014-10-02 00:29:10.042], ~Z[2014-10-02 00:29:10.021], :millisecond)
+  21
+  iex> UTCDateTime.diff(~Z[2014-10-02 00:29:10], ~Z[2014-10-02 00:29:12])
+  -2
+  iex> UTCDateTime.diff(~Z[-0001-10-02 00:29:10], ~Z[-0001-10-02 00:29:12])
+  -2
+  ```
+
+  ```elixir
+  # to Gregorian seconds
+  iex> UTCDateTime.diff(~Z[2014-10-02 00:29:10], ~Z[0000-01-01 00:00:00])
+  63579428950
+  ```
+  """
+  @spec diff(UTCDateTime.t(), UTCDateTime.t(), System.time_unit()) :: integer
+  def diff(utc_datetime1, utc_datetime2, unit \\ :second)
+
+  def diff(
+        %__MODULE__{
+          year: year1,
+          month: month1,
+          day: day1,
+          hour: hour1,
+          minute: minute1,
+          second: second1,
+          microsecond: microsecond1
+        },
+        %__MODULE__{
+          year: year2,
+          month: month2,
+          day: day2,
+          hour: hour2,
+          minute: minute2,
+          second: second2,
+          microsecond: microsecond2
+        },
+        unit
+      ) do
+    units1 =
+      year1
+      |> ISO.naive_datetime_to_iso_days(month1, day1, hour1, minute1, second1, microsecond1)
+      |> ISO.iso_days_to_unit(unit)
+
+    units2 =
+      year2
+      |> ISO.naive_datetime_to_iso_days(month2, day2, hour2, minute2, second2, microsecond2)
+      |> ISO.iso_days_to_unit(unit)
+
+    units1 - units2
+  end
 
   @doc ~S"""
   Returns the given `utc_datetime` with the microsecond field truncated to the

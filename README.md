@@ -108,6 +108,11 @@ iex> TimeMachinex.utc_now
 ### v0.0.8 (2019-12-??)
 
 New Features:
+- `add/2`, `add/3`
+- `diff/2`, `diff3`
+
+Fixes:
+- Allow negative years in ISO 8601.
 
 Cleanup:
 - `truncate/2`
@@ -184,7 +189,7 @@ Additional:
 - Integrations
   - `:fixtures`
 - Release 0.0.8
-  - Add / Diff
+  - Diff
   - Benchmarks
 - Release 0.0.9
   - To Unix
