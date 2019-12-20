@@ -1206,6 +1206,7 @@ defmodule UTCDateTime do
 
   ### From/To Epochs (Unix, NTFS) ###
 
+  @ntfs_days :calendar.date_to_gregorian_days({1601, 1, 1})
   @unix_days :calendar.date_to_gregorian_days({1970, 1, 1})
 
   @doc ~S"""
@@ -1276,7 +1277,6 @@ defmodule UTCDateTime do
   ~Z[6403-03-17 07:05:22.320312]
   ```
 
-
   Negative Unix times are supported, up to -62167219200 seconds,
   which is equivalent to "0000-01-01T00:00:00Z" or 0 Gregorian seconds.
 
@@ -1339,6 +1339,53 @@ defmodule UTCDateTime do
       ISO.naive_datetime_to_iso_days(year, month, day, hour, minute, second, microsecond)
 
     ISO.iso_days_to_unit({days - @unix_days, fraction}, unit)
+  end
+
+  @doc ~S"""
+  Converts the given `utc_datetime` to the given NTFS or Windows time.
+
+  It will return the integer with the given unit,
+  according to `System.convert_time_unit/3`,
+  but defaults to the stand 100 nanosecond intervals.
+
+  For reference: [support.microsoft.com](https://support.microsoft.com/help/188768/info-working-with-the-filetime-structure)
+
+  ## Examples
+
+
+  ```elixir
+  iex> UTCDateTime.to_ntfs(~Z[2019-12-20 23:20:52.832399])
+  132213576528323990
+  iex> UTCDateTime.to_ntfs(~Z[2019-12-20 23:20:52.832399], :millisecond)
+  13221357652832
+  iex> UTCDateTime.to_ntfs(~Z[2019-12-20 23:20:52.832399], :microsecond)
+  13221357652832399
+  ```
+
+  ```elixir
+  iex> UTCDateTime.to_ntfs(~Z[1219-12-20 23:20:52.832399])
+  -120242039471676010
+  ```
+  """
+  @spec to_ntfs(UTCDateTime.t(), System.time_unit()) :: integer
+  def to_ntfs(utc_datetime, unit \\ 10_000_000)
+
+  def to_ntfs(
+        %__MODULE__{
+          year: year,
+          month: month,
+          day: day,
+          hour: hour,
+          minute: minute,
+          second: second,
+          microsecond: microsecond
+        },
+        unit
+      ) do
+    {days, fraction} =
+      ISO.naive_datetime_to_iso_days(year, month, day, hour, minute, second, microsecond)
+
+    ISO.iso_days_to_unit({days - @ntfs_days, fraction}, unit)
   end
 
   ### Truncate / Add / Diff ###

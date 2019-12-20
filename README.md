@@ -109,6 +109,7 @@ iex> TimeMachinex.utc_now
 
 New Features:
 - `from_unix/1`, `from_unix/2`
+- `to_ntfs/1`, `to_ntfs/2`
 - `to_unix/1`, `to_unix/2`
 
 
@@ -196,9 +197,7 @@ Additional:
 - Integrations
   - `:fixtures`
 - Release 0.0.9
-  - To windows
   - to_epoch(epoch, time_unit)
-  - Benchmarks
 - Release 0.0.10
   - `to_local_datetime/1` (in caller)
 - Release 0.0.11
