@@ -1288,6 +1288,72 @@ defmodule UTCDateTime do
   end
 
   @doc ~S"""
+  Subtracts `utc_datetime1` from `utc_datetime2`.
+
+  The answer can be returned in any `unit` available from `t:System.time_unit/0`.
+
+  This function returns the difference in seconds where seconds are measured
+  according to `Calendar.ISO`.
+
+  ## Examples
+
+  ```elixir
+  iex> UTCDateTime.diff(~Z[2014-10-02 00:29:12], ~Z[2014-10-02 00:29:10])
+  2
+  iex> UTCDateTime.diff(~Z[2014-10-02 00:29:12], ~Z[2014-10-02 00:29:10], :microsecond)
+  2_000_000
+  iex> UTCDateTime.diff(~Z[2014-10-02 00:29:10.042], ~Z[2014-10-02 00:29:10.021], :millisecond)
+  21
+  iex> UTCDateTime.diff(~Z[2014-10-02 00:29:10], ~Z[2014-10-02 00:29:12])
+  -2
+  iex> UTCDateTime.diff(~Z[-0001-10-02 00:29:10], ~Z[-0001-10-02 00:29:12])
+  -2
+  ```
+
+  ```elixir
+  # to Gregorian seconds
+  iex> UTCDateTime.diff(~Z[2014-10-02 00:29:10], ~Z[0000-01-01 00:00:00])
+  63579428950
+  ```
+  """
+  @spec diff(UTCDateTime.t(), UTCDateTime.t(), System.time_unit()) :: integer
+  def diff(utc_datetime1, utc_datetime2, unit \\ :second)
+
+  def diff(
+        %__MODULE__{
+          year: year1,
+          month: month1,
+          day: day1,
+          hour: hour1,
+          minute: minute1,
+          second: second1,
+          microsecond: microsecond1
+        },
+        %__MODULE__{
+          year: year2,
+          month: month2,
+          day: day2,
+          hour: hour2,
+          minute: minute2,
+          second: second2,
+          microsecond: microsecond2
+        },
+        unit
+      ) do
+    units1 =
+      year1
+      |> ISO.naive_datetime_to_iso_days(month1, day1, hour1, minute1, second1, microsecond1)
+      |> ISO.iso_days_to_unit(unit)
+
+    units2 =
+      year2
+      |> ISO.naive_datetime_to_iso_days(month2, day2, hour2, minute2, second2, microsecond2)
+      |> ISO.iso_days_to_unit(unit)
+
+    units1 - units2
+  end
+
+  @doc ~S"""
   Returns the given `utc_datetime` with the microsecond field truncated to the
   given precision (`:microsecond`, `:millisecond` or `:second`).
 
