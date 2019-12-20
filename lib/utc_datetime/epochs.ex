@@ -48,4 +48,12 @@ defmodule UTCDateTime.Epochs do
   Enum.each(@epochs, fn {epoch, value} ->
     def epoch(unquote(epoch)), do: unquote(Macro.escape(value))
   end)
+
+  @doc false
+  @spec epoch_days(epoch :: atom) :: integer
+  Enum.each(@epochs, fn {epoch, %{year: y, month: m, day: d}} ->
+    if d > 0 do
+      def epoch_days(unquote(epoch)), do: unquote(:calendar.date_to_gregorian_days({y, m, d}))
+    end
+  end)
 end
