@@ -91,6 +91,18 @@ iex> Jason.encode!(%{created_at: ~Z[2019-12-16 00:00:12.068421]})
 ```
 
 
+### TimeMachinex
+[![Hex.pm](https://img.shields.io/hexpm/v/time_machinex.svg "Hex")](https://hex.pm/packages/time_machinex)
+
+Integrates with [TimeMachinex](https://github.com/shinyscropion/TimeMachinex) and can be used through `TimeMachinex.utc_now/1`.
+
+Example:
+```elixir
+iex> TimeMachinex.utc_now
+~Z[2019-12-16 00:00:12.068421]
+```
+
+
 ## Changelog
 
 ### v0.0.8 (2019-12-??)
@@ -171,7 +183,6 @@ Additional:
 
 - Integrations
   - `:fixtures`
-  - `:time_machinex`
 - Release 0.0.8
   - Add / Diff
   - Benchmarks
