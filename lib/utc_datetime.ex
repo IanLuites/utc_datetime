@@ -1388,6 +1388,54 @@ defmodule UTCDateTime do
     ISO.iso_days_to_unit({days - @ntfs_days, fraction}, unit)
   end
 
+  @doc ~S"""
+  Converts the given `utc_datetime` to the given epoch time.
+
+  It will return the integer with the given unit,
+  according to `System.convert_time_unit/3`.
+
+  ## Examples
+
+  ```elixir
+  iex> UTCDateTime.to_epoch(~Z[2019-12-20 23:20:52], :unix)
+  1576884052
+  iex> UTCDateTime.to_epoch(~Z[2019-12-20 23:20:52], :ntfs)
+  13221357652
+  iex> UTCDateTime.to_epoch(~Z[2019-12-20 23:20:52], :go)
+  63712480852
+  ```
+
+  ```elixir
+  iex> UTCDateTime.to_epoch(~Z[2019-12-20 23:20:52.832399], :unix)
+  1576884052
+  iex> UTCDateTime.to_epoch(~Z[2019-12-20 23:20:52.832399], :unix, :millisecond)
+  1576884052832
+  iex> UTCDateTime.to_epoch(~Z[2019-12-20 23:20:52.832399], :unix, :microsecond)
+  1576884052832399
+  ```
+  """
+  @spec to_epoch(UTCDateTime.t(), UTCDateTime.epoch(), System.time_unit()) :: integer
+  def to_epoch(utc_datetime, epoch, unit \\ :second)
+
+  def to_epoch(
+        %__MODULE__{
+          year: year,
+          month: month,
+          day: day,
+          hour: hour,
+          minute: minute,
+          second: second,
+          microsecond: microsecond
+        },
+        epoch,
+        unit
+      ) do
+    {days, fraction} =
+      ISO.naive_datetime_to_iso_days(year, month, day, hour, minute, second, microsecond)
+
+    ISO.iso_days_to_unit({days - __MODULE__.Epochs.epoch_days(epoch), fraction}, unit)
+  end
+
   ### Truncate / Add / Diff ###
 
   @doc ~S"""
