@@ -1200,6 +1200,87 @@ defmodule UTCDateTime do
   ### Truncate / Add / Diff ###
 
   @doc ~S"""
+  Adds a specified amount of time to a `UTCDateTime`.
+
+  Accepts an `amount_to_add` in any `unit` available from `t:System.time_unit/0`.
+
+  Negative values will move the `utc_datetime` backwards in time.
+
+  ## Examples
+
+  ```elixir
+  # adds seconds by default
+  iex> UTCDateTime.add(~Z[2014-10-02 00:29:10], 2)
+  ~Z[2014-10-02 00:29:12]
+  ```
+
+  ```elixir
+  # accepts negative offsets
+  iex> UTCDateTime.add(~Z[2014-10-02 00:29:10], -2)
+  ~Z[2014-10-02 00:29:08]
+  ```
+
+  ```elixir
+  # can work with other units
+  iex> UTCDateTime.add(~Z[2014-10-02 00:29:10], 2_000, :millisecond)
+  ~Z[2014-10-02 00:29:12]
+  ```
+
+  ```elixir
+  # keeps the same precision
+  iex> UTCDateTime.add(~Z[2014-10-02 00:29:10.021], 21, :second)
+  ~Z[2014-10-02 00:29:31.021]
+  ```
+
+  ```elixir
+  # changes below the precision will not be visible
+  iex> hidden = UTCDateTime.add(~Z[2014-10-02 00:29:10], 21, :millisecond)
+  iex> hidden.microsecond # ~Z[2014-10-02 00:29:10]
+  {21000, 0}
+  ```
+
+  ```elixir
+  # from Gregorian seconds
+  iex> UTCDateTime.add(~Z[0000-01-01 00:00:00], 63_579_428_950)
+  ~Z[2014-10-02 00:29:10]
+  ```
+  """
+  @spec add(UTCDateTime.t(), integer, System.time_unit()) :: UTCDateTime.t()
+  def add(utc_datetime, amount_to_add, unit \\ :second)
+
+  def add(
+        %__MODULE__{
+          year: year,
+          month: month,
+          day: day,
+          hour: hour,
+          minute: minute,
+          second: second,
+          microsecond: microsecond = {_, precision}
+        },
+        amount_to_add,
+        unit
+      ) do
+    ppd = System.convert_time_unit(86_400, :second, unit)
+
+    {year, month, day, hour, minute, second, {microsecond, _}} =
+      year
+      |> ISO.naive_datetime_to_iso_days(month, day, hour, minute, second, microsecond)
+      |> ISO.add_day_fraction_to_iso_days(amount_to_add, ppd)
+      |> ISO.naive_datetime_from_iso_days()
+
+    %__MODULE__{
+      year: year,
+      month: month,
+      day: day,
+      hour: hour,
+      minute: minute,
+      second: second,
+      microsecond: {microsecond, precision}
+    }
+  end
+
+  @doc ~S"""
   Returns the given `utc_datetime` with the microsecond field truncated to the
   given precision (`:microsecond`, `:millisecond` or `:second`).
 
