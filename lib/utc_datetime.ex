@@ -1209,6 +1209,91 @@ defmodule UTCDateTime do
   @unix_days :calendar.date_to_gregorian_days({1970, 1, 1})
 
   @doc ~S"""
+  Converts the given Unix time to `UTCDateTime`.
+
+  The integer can be given in different unit
+  according to `System.convert_time_unit/3` and it will
+  be converted to microseconds internally.
+
+  ## Examples
+
+  ```elixir
+  iex> UTCDateTime.from_unix(1_464_096_368)
+  {:ok, ~Z[2016-05-24 13:26:08]}
+
+  iex> UTCDateTime.from_unix(1_432_560_368_868_569, :microsecond)
+  {:ok, ~Z[2015-05-25 13:26:08.868569]}
+
+  The unit can also be an integer as in `t:System.time_unit/0`:
+
+  ```elixir
+  iex> UTCDateTime.from_unix(143_256_036_886_856, 1024)
+  {:ok, ~Z[6403-03-17 07:05:22.320312]}
+  ```
+
+  Negative Unix times are supported, up to -62167219200 seconds,
+  which is equivalent to "0000-01-01T00:00:00Z" or 0 Gregorian seconds.
+  """
+  @spec from_unix(integer, :native | System.time_unit()) ::
+          {:ok, UTCDateTime.t()} | {:error, atom}
+  def from_unix(unix, unit \\ :second) do
+    case ISO.from_unix(unix, unit) do
+      {:ok, {year, month, day}, {hour, minute, second}, microsecond} ->
+        {:ok,
+         %UTCDateTime{
+           year: year,
+           month: month,
+           day: day,
+           hour: hour,
+           minute: minute,
+           second: second,
+           microsecond: microsecond
+         }}
+
+      {:error, _} = error ->
+        error
+    end
+  end
+
+  @doc ~S"""
+  Converts the given Unix time to `UTCDateTime`.
+
+  The integer can be given in different unit
+  according to `System.convert_time_unit/3` and it will
+  be converted to microseconds internally.
+
+  ## Examples
+
+  ```elixir
+  # An easy way to get the Unix epoch is passing 0 to this function
+  iex> UTCDateTime.from_unix!(0)
+  ~Z[1970-01-01 00:00:00Z]
+  iex> UTCDateTime.from_unix!(1_464_096_368)
+  ~Z[2016-05-24 13:26:08]
+  iex> UTCDateTime.from_unix!(1_432_560_368_868_569, :microsecond)
+  ~Z[2015-05-25 13:26:08.868569]
+  iex> UTCDateTime.from_unix!(143_256_036_886_856, 1024)
+  ~Z[6403-03-17 07:05:22.320312]
+  ```
+
+
+  Negative Unix times are supported, up to -62167219200 seconds,
+  which is equivalent to "0000-01-01T00:00:00Z" or 0 Gregorian seconds.
+
+  ```elixir
+  iex> UTCDateTime.from_unix!(-12_063_167_219_280)
+  ** (ArgumentError) invalid Unix time -12063167219280
+  ```
+  """
+  @spec from_unix!(integer, :native | System.time_unit()) :: UTCDateTime.t() | no_return
+  def from_unix!(unix, unit \\ :second) do
+    case from_unix(unix, unit) do
+      {:ok, datetime} -> datetime
+      {:error, :invalid_unix_time} -> raise ArgumentError, "invalid Unix time #{unix}"
+    end
+  end
+
+  @doc ~S"""
   Converts the given `utc_datetime` to Unix time.
 
   It will return the integer with the given unit,
