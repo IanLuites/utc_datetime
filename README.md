@@ -110,6 +110,9 @@ iex> TimeMachinex.utc_now
 New Features:
 - `add/2`, `add/3`
 
+Fixes:
+- Allow negative years in ISO 8601.
+
 Cleanup:
 - `truncate/2`
 

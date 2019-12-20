@@ -824,6 +824,13 @@ defmodule UTCDateTime do
 
   @sep_iso8601 [?T, ?\s, ?t]
 
+  def from_iso8601(string)
+
+  def from_iso8601("-" <> string) do
+    with {:ok, utc_datetime = %{year: y}} <- from_iso8601(string),
+         do: {:ok, %{utc_datetime | year: -y}}
+  end
+
   # credo:disable-for-next-line Credo.Check.Refactor.CyclomaticComplexity
   def from_iso8601(string) do
     with <<unquote(match_date), sep, unquote(match_time), rest::binary>> <- string,
