@@ -105,7 +105,7 @@ iex> TimeMachinex.utc_now
 
 ## Changelog
 
-### v0.0.8 (2019-12-??)
+### v0.0.8 (2019-12-20)
 
 New Features:
 - `add/2`, `add/3`
