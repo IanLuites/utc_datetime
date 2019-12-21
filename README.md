@@ -105,7 +105,7 @@ iex> TimeMachinex.utc_now
 
 ## Changelog
 
-### v0.0.9 (2019-12-??)
+### v0.0.9 (2019-12-20)
 
 New Features:
 - `from_unix/1`, `from_unix/2`
