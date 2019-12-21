@@ -1204,6 +1204,238 @@ defmodule UTCDateTime do
     }
   end
 
+  ### From/To Epochs (Unix, NTFS) ###
+
+  @ntfs_days :calendar.date_to_gregorian_days({1601, 1, 1})
+  @unix_days :calendar.date_to_gregorian_days({1970, 1, 1})
+
+  @doc ~S"""
+  Converts the given Unix time to `UTCDateTime`.
+
+  The integer can be given in different unit
+  according to `System.convert_time_unit/3` and it will
+  be converted to microseconds internally.
+
+  ## Examples
+
+  ```elixir
+  iex> UTCDateTime.from_unix(1_464_096_368)
+  {:ok, ~Z[2016-05-24 13:26:08]}
+
+  iex> UTCDateTime.from_unix(1_432_560_368_868_569, :microsecond)
+  {:ok, ~Z[2015-05-25 13:26:08.868569]}
+
+  The unit can also be an integer as in `t:System.time_unit/0`:
+
+  ```elixir
+  iex> UTCDateTime.from_unix(143_256_036_886_856, 1024)
+  {:ok, ~Z[6403-03-17 07:05:22.320312]}
+  ```
+
+  Negative Unix times are supported, up to -62167219200 seconds,
+  which is equivalent to "0000-01-01T00:00:00Z" or 0 Gregorian seconds.
+  """
+  @spec from_unix(integer, :native | System.time_unit()) ::
+          {:ok, UTCDateTime.t()} | {:error, atom}
+  def from_unix(unix, unit \\ :second) do
+    case ISO.from_unix(unix, unit) do
+      {:ok, {year, month, day}, {hour, minute, second}, microsecond} ->
+        {:ok,
+         %UTCDateTime{
+           year: year,
+           month: month,
+           day: day,
+           hour: hour,
+           minute: minute,
+           second: second,
+           microsecond: microsecond
+         }}
+
+      {:error, _} = error ->
+        error
+    end
+  end
+
+  @doc ~S"""
+  Converts the given Unix time to `UTCDateTime`.
+
+  The integer can be given in different unit
+  according to `System.convert_time_unit/3` and it will
+  be converted to microseconds internally.
+
+  ## Examples
+
+  ```elixir
+  # An easy way to get the Unix epoch is passing 0 to this function
+  iex> UTCDateTime.from_unix!(0)
+  ~Z[1970-01-01 00:00:00Z]
+  iex> UTCDateTime.from_unix!(1_464_096_368)
+  ~Z[2016-05-24 13:26:08]
+  iex> UTCDateTime.from_unix!(1_432_560_368_868_569, :microsecond)
+  ~Z[2015-05-25 13:26:08.868569]
+  iex> UTCDateTime.from_unix!(143_256_036_886_856, 1024)
+  ~Z[6403-03-17 07:05:22.320312]
+  ```
+
+  Negative Unix times are supported, up to -62167219200 seconds,
+  which is equivalent to "0000-01-01T00:00:00Z" or 0 Gregorian seconds.
+
+  ```elixir
+  iex> UTCDateTime.from_unix!(-12_063_167_219_280)
+  ** (ArgumentError) invalid Unix time -12063167219280
+  ```
+  """
+  @spec from_unix!(integer, :native | System.time_unit()) :: UTCDateTime.t() | no_return
+  def from_unix!(unix, unit \\ :second) do
+    case from_unix(unix, unit) do
+      {:ok, datetime} -> datetime
+      {:error, :invalid_unix_time} -> raise ArgumentError, "invalid Unix time #{unix}"
+    end
+  end
+
+  @doc ~S"""
+  Converts the given `utc_datetime` to Unix time.
+
+  It will return the integer with the given unit,
+  according to `System.convert_time_unit/3`.
+
+  ## Examples
+
+  ```elixir
+  iex> 1_464_096_368 |> UTCDateTime.from_unix!() |> UTCDateTime.to_unix()
+  1464096368
+  ```
+
+  ```elixir
+  iex> UTCDateTime.to_unix(~Z[2019-12-20 23:20:52.832399])
+  1576884052
+  iex> UTCDateTime.to_unix(~Z[2019-12-20 23:20:52.832399], :millisecond)
+  1576884052832
+  iex> UTCDateTime.to_unix(~Z[2019-12-20 23:20:52.832399], :microsecond)
+  1576884052832399
+  ```
+
+  ```elixir
+  iex> UTCDateTime.to_unix(~Z[1219-12-20 23:20:52.832399])
+  -23668677548
+  ```
+  """
+  @spec to_unix(UTCDateTime.t(), System.time_unit()) :: integer
+  def to_unix(utc_datetime, unit \\ :second)
+
+  def to_unix(
+        %__MODULE__{
+          year: year,
+          month: month,
+          day: day,
+          hour: hour,
+          minute: minute,
+          second: second,
+          microsecond: microsecond
+        },
+        unit
+      ) do
+    {days, fraction} =
+      ISO.naive_datetime_to_iso_days(year, month, day, hour, minute, second, microsecond)
+
+    ISO.iso_days_to_unit({days - @unix_days, fraction}, unit)
+  end
+
+  @doc ~S"""
+  Converts the given `utc_datetime` to the given NTFS or Windows time.
+
+  It will return the integer with the given unit,
+  according to `System.convert_time_unit/3`,
+  but defaults to the stand 100 nanosecond intervals.
+
+  For reference: [support.microsoft.com](https://support.microsoft.com/help/188768/info-working-with-the-filetime-structure)
+
+  ## Examples
+
+
+  ```elixir
+  iex> UTCDateTime.to_ntfs(~Z[2019-12-20 23:20:52.832399])
+  132213576528323990
+  iex> UTCDateTime.to_ntfs(~Z[2019-12-20 23:20:52.832399], :millisecond)
+  13221357652832
+  iex> UTCDateTime.to_ntfs(~Z[2019-12-20 23:20:52.832399], :microsecond)
+  13221357652832399
+  ```
+
+  ```elixir
+  iex> UTCDateTime.to_ntfs(~Z[1219-12-20 23:20:52.832399])
+  -120242039471676010
+  ```
+  """
+  @spec to_ntfs(UTCDateTime.t(), System.time_unit()) :: integer
+  def to_ntfs(utc_datetime, unit \\ 10_000_000)
+
+  def to_ntfs(
+        %__MODULE__{
+          year: year,
+          month: month,
+          day: day,
+          hour: hour,
+          minute: minute,
+          second: second,
+          microsecond: microsecond
+        },
+        unit
+      ) do
+    {days, fraction} =
+      ISO.naive_datetime_to_iso_days(year, month, day, hour, minute, second, microsecond)
+
+    ISO.iso_days_to_unit({days - @ntfs_days, fraction}, unit)
+  end
+
+  @doc ~S"""
+  Converts the given `utc_datetime` to the given epoch time.
+
+  It will return the integer with the given unit,
+  according to `System.convert_time_unit/3`.
+
+  ## Examples
+
+  ```elixir
+  iex> UTCDateTime.to_epoch(~Z[2019-12-20 23:20:52], :unix)
+  1576884052
+  iex> UTCDateTime.to_epoch(~Z[2019-12-20 23:20:52], :ntfs)
+  13221357652
+  iex> UTCDateTime.to_epoch(~Z[2019-12-20 23:20:52], :go)
+  63712480852
+  ```
+
+  ```elixir
+  iex> UTCDateTime.to_epoch(~Z[2019-12-20 23:20:52.832399], :unix)
+  1576884052
+  iex> UTCDateTime.to_epoch(~Z[2019-12-20 23:20:52.832399], :unix, :millisecond)
+  1576884052832
+  iex> UTCDateTime.to_epoch(~Z[2019-12-20 23:20:52.832399], :unix, :microsecond)
+  1576884052832399
+  ```
+  """
+  @spec to_epoch(UTCDateTime.t(), UTCDateTime.epoch(), System.time_unit()) :: integer
+  def to_epoch(utc_datetime, epoch, unit \\ :second)
+
+  def to_epoch(
+        %__MODULE__{
+          year: year,
+          month: month,
+          day: day,
+          hour: hour,
+          minute: minute,
+          second: second,
+          microsecond: microsecond
+        },
+        epoch,
+        unit
+      ) do
+    {days, fraction} =
+      ISO.naive_datetime_to_iso_days(year, month, day, hour, minute, second, microsecond)
+
+    ISO.iso_days_to_unit({days - __MODULE__.Epochs.epoch_days(epoch), fraction}, unit)
+  end
+
   ### Truncate / Add / Diff ###
 
   @doc ~S"""
