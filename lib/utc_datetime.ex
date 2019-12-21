@@ -1224,6 +1224,7 @@ defmodule UTCDateTime do
 
   iex> UTCDateTime.from_unix(1_432_560_368_868_569, :microsecond)
   {:ok, ~Z[2015-05-25 13:26:08.868569]}
+  ```
 
   The unit can also be an integer as in `t:System.time_unit/0`:
 
