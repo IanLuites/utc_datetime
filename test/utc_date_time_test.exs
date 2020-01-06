@@ -24,6 +24,7 @@ defmodule UTCDateTimeTest do
   describe "Ecto" do
     test "embed_as" do
       assert UTCDateTime.embed_as(nil) == :self
+      assert UTCDateTime.USec.embed_as(nil) == :self
     end
 
     test "equal?" do
@@ -32,10 +33,14 @@ defmodule UTCDateTimeTest do
 
       assert UTCDateTime.equal?(a, a)
       refute UTCDateTime.equal?(a, b)
+
+      assert UTCDateTime.USec.equal?(a, a)
+      refute UTCDateTime.USec.equal?(a, b)
     end
 
     test "type" do
       assert UTCDateTime.type() == :utc_datetime
+      assert UTCDateTime.USec.type() == :utc_datetime_usec
     end
 
     test "cast" do
@@ -50,6 +55,18 @@ defmodule UTCDateTimeTest do
       assert UTCDateTime.cast(5) == :error
     end
 
+    test "cast (usec)" do
+      datetime = DateTime.utc_now()
+      utc_datetime = UTCDateTime.from_datetime(datetime)
+      naive_datetime = UTCDateTime.to_naive(utc_datetime)
+
+      assert UTCDateTime.USec.cast(utc_datetime) == {:ok, utc_datetime}
+      assert UTCDateTime.USec.cast(datetime) == {:ok, utc_datetime}
+      assert UTCDateTime.USec.cast(naive_datetime) == {:ok, utc_datetime}
+      assert UTCDateTime.USec.cast(to_string(utc_datetime)) == {:ok, utc_datetime}
+      assert UTCDateTime.USec.cast(5) == :error
+    end
+
     test "load" do
       datetime = DateTime.truncate(DateTime.utc_now(), :second)
       utc_datetime = UTCDateTime.from_datetime(datetime)
@@ -57,11 +74,25 @@ defmodule UTCDateTimeTest do
       assert UTCDateTime.load(datetime) == {:ok, utc_datetime}
     end
 
+    test "load (usec)" do
+      datetime = DateTime.utc_now()
+      utc_datetime = UTCDateTime.from_datetime(datetime)
+
+      assert UTCDateTime.USec.load(datetime) == {:ok, utc_datetime}
+    end
+
     test "dump" do
       datetime = DateTime.truncate(DateTime.utc_now(), :second)
       utc_datetime = UTCDateTime.from_datetime(datetime)
 
       assert UTCDateTime.dump(utc_datetime) == {:ok, datetime}
+    end
+
+    test "dump (usec)" do
+      datetime = DateTime.utc_now()
+      utc_datetime = UTCDateTime.from_datetime(datetime)
+
+      assert UTCDateTime.USec.dump(utc_datetime) == {:ok, datetime}
     end
   end
 
