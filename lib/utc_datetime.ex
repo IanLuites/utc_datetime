@@ -1616,36 +1616,19 @@ defmodule UTCDateTime do
   ### Ecto Integration (Optional) ###
 
   if Code.ensure_loaded?(Ecto.Type) do
-    @behaviour Ecto.Type
+    require __MODULE__.EctoTyper
+    __MODULE__.EctoTyper.type(:utc_datetime)
 
-    @impl Ecto.Type
-    @spec embed_as(term) :: :self
-    def embed_as(_), do: :self
+    defmodule USec do
+      @moduledoc ~S"""
+      Microsecond precision UTCDateTime Ecto type.
 
-    @impl Ecto.Type
-    @spec equal?(t, t) :: boolean
-    def equal?(term1, term2), do: term1 == term2
-
-    @impl Ecto.Type
-    @spec type :: :utc_datetime
-    def type, do: :utc_datetime
-
-    @impl Ecto.Type
-    @spec cast(term) :: {:ok, t} | :error
-    def cast(%__MODULE__{} = datetime), do: {:ok, datetime}
-    def cast(%DateTime{} = datetime), do: {:ok, from_datetime(datetime)}
-    def cast(%NaiveDateTime{} = datetime), do: {:ok, from_naive(datetime)}
-    def cast(datetime) when is_binary(datetime), do: from_iso8601(datetime)
-    def cast(_), do: :error
-
-    @impl Ecto.Type
-    @spec load(term) :: {:ok, t} | :error
-    def load(data), do: {:ok, from_datetime(data)}
-
-    @impl Ecto.Type
-    @spec dump(t) :: {:ok, DateTime.t()} | :error
-    def dump(%__MODULE__{} = datetime), do: {:ok, to_datetime(datetime)}
-    def dump(_), do: :error
+      For [default] second precision
+      use `UTCDateTime` in stead of `UTCDateTime.USec`.
+      """
+      require UTCDateTime.EctoTyper
+      UTCDateTime.EctoTyper.type(:utc_datetime_usec)
+    end
   end
 
   ### Jason Integration (Optional) ###
