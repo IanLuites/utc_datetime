@@ -41,7 +41,7 @@ by adding `utc_datetime` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:utc_datetime, "~> 0.0.7"}
+    {:utc_datetime, "~> 0.0.10"}
   ]
 end
 ```
@@ -76,6 +76,9 @@ or alternatively
   end
 ```
 
+The `UTCDateTime.USec` is also available and will hold microsecond
+precision timestamps.
+
 
 ### Jason
 [![Hex.pm](https://img.shields.io/hexpm/v/jason.svg "Hex")](https://hex.pm/packages/jason)
@@ -104,6 +107,12 @@ iex> TimeMachinex.utc_now
 
 
 ## Changelog
+
+### v0.0.10 (2020-01-06)
+
+New Features:
+- `UTCDateTime.USec` Ecto type.
+
 
 ### v0.0.9 (2019-12-20)
 
@@ -197,9 +206,9 @@ Additional:
 
 - Integrations
   - `:fixtures`
-- Release 0.0.10
-  - `to_local_datetime/1` (in caller)
 - Release 0.0.11
+  - `to_local_datetime/1` (in caller)
+- Release 0.0.12
   - `from_human/1` best effort parse
 
 

@@ -315,7 +315,7 @@ defmodule UTCDateTime do
   ### DateTime ###
 
   @doc ~S"""
-  Converts the given `UTCDateTime` to `NaiveDateTime`.
+  Converts the given `UTCDateTime` to `DateTime`.
 
   The given `utc_datetime` does not contain a calendar,
   so `Calendar.ISO` is set by default.
@@ -326,6 +326,7 @@ defmodule UTCDateTime do
   ```elixir
   iex> UTCDateTime.to_datetime(~Z[2016-05-24 13:26:08.003])
   ~U[2016-05-24 13:26:08.003Z]
+  ```
   """
   @spec to_datetime(UTCDateTime.t(), Calendar.calendar()) :: DateTime.t()
   def to_datetime(utc_datetime, calendar \\ Calendar.ISO)
