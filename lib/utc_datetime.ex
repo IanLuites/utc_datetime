@@ -1629,6 +1629,10 @@ defmodule UTCDateTime do
       """
       require UTCDateTime.EctoTyper
       UTCDateTime.EctoTyper.type(:utc_datetime_usec)
+
+      @doc false
+      @spec from_unix!(integer, :native | System.time_unit()) :: UTCDateTime.t() | no_return
+      def from_unix!(unix, unit \\ :second), do: UTCDateTime.from_unix!(unix, unit)
     end
   end
 
