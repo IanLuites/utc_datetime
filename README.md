@@ -41,7 +41,7 @@ by adding `utc_datetime` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:utc_datetime, "~> 0.0.10"}
+    {:utc_datetime, "~> 0.0.11"}
   ]
 end
 ```
@@ -107,6 +107,12 @@ iex> TimeMachinex.utc_now
 
 
 ## Changelog
+
+### v0.0.11 (2020-01-07)
+
+Fixes:
+- Ecto passes `NaiveDateTime` even when using `utc_datetime`.
+
 
 ### v0.0.10 (2020-01-06)
 
