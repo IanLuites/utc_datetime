@@ -30,7 +30,7 @@ if Code.ensure_loaded?(Ecto.Type) do
 
         @impl Ecto.Type
         @spec load(term) :: {:ok, UTCDateTime.t()} | :error
-        def load(data), do: {:ok, UTCDateTime.from_datetime(data)}
+        def load(data), do: cast(data)
 
         @impl Ecto.Type
         @spec dump(UTCDateTime.t()) :: {:ok, DateTime.t()} | :error
