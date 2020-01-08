@@ -41,7 +41,7 @@ by adding `utc_datetime` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:utc_datetime, "~> 0.0.11"}
+    {:utc_datetime, "~> 0.0.12"}
   ]
 end
 ```
@@ -107,6 +107,12 @@ iex> TimeMachinex.utc_now
 
 
 ## Changelog
+
+### v0.0.12 (2020-01-08)
+
+Fixes:
+- Ecto conditional compile fix.
+
 
 ### v0.0.11 (2020-01-07)
 
@@ -212,9 +218,9 @@ Additional:
 
 - Integrations
   - `:fixtures`
-- Release 0.0.11
+- Release 0.0.13
   - `to_local_datetime/1` (in caller)
-- Release 0.0.12
+- Release 0.0.14
   - `from_human/1` best effort parse
 
 
