@@ -1,10 +1,10 @@
-if Code.ensure_loaded?(Ecto.Type) do
-  defmodule UTCDateTime.EctoTyper do
-    @moduledoc false
+defmodule UTCDateTime.EctoTyper do
+  @moduledoc false
 
-    @doc false
-    # credo:disable-for-next-line Credo.Check.Refactor.CyclomaticComplexity
-    defmacro type(base) do
+  @doc false
+  # credo:disable-for-next-line Credo.Check.Refactor.CyclomaticComplexity
+  defmacro type(base) do
+    if Code.ensure_loaded?(Ecto.Type) do
       quote do
         @behaviour Ecto.Type
 

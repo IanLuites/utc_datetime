@@ -1616,24 +1616,22 @@ defmodule UTCDateTime do
 
   ### Ecto Integration (Optional) ###
 
-  if Code.ensure_loaded?(Ecto.Type) do
-    require __MODULE__.EctoTyper
-    __MODULE__.EctoTyper.type(:utc_datetime)
+  require UTCDateTime.EctoTyper
+  UTCDateTime.EctoTyper.type(:utc_datetime)
 
-    defmodule USec do
-      @moduledoc ~S"""
-      Microsecond precision UTCDateTime Ecto type.
+  defmodule USec do
+    @moduledoc ~S"""
+    Microsecond precision UTCDateTime Ecto type.
 
-      For [default] second precision
-      use `UTCDateTime` in stead of `UTCDateTime.USec`.
-      """
-      require UTCDateTime.EctoTyper
-      UTCDateTime.EctoTyper.type(:utc_datetime_usec)
+    For [default] second precision
+    use `UTCDateTime` in stead of `UTCDateTime.USec`.
+    """
+    require UTCDateTime.EctoTyper
+    UTCDateTime.EctoTyper.type(:utc_datetime_usec)
 
-      @doc false
-      @spec from_unix!(integer, :native | System.time_unit()) :: UTCDateTime.t() | no_return
-      def from_unix!(unix, unit \\ :second), do: UTCDateTime.from_unix!(unix, unit)
-    end
+    @doc false
+    @spec from_unix!(integer, :native | System.time_unit()) :: UTCDateTime.t() | no_return
+    def from_unix!(unix, unit \\ :second), do: UTCDateTime.from_unix!(unix, unit)
   end
 
   ### Jason Integration (Optional) ###
