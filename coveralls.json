@@ -1,0 +1,9 @@
+{
+  "skip_files": [
+    "lib/utc_datetime/ecto_typer.ex"
+  ],
+  "custom_stop_words": [
+    "\\\\\\\\",
+    "defdelegate"
+  ]
+}

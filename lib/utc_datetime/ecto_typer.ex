@@ -22,9 +22,9 @@ defmodule UTCDateTime.EctoTyper do
 
         @impl Ecto.Type
         @spec cast(term) :: {:ok, UTCDateTime.t()} | :error
-        def cast(%UTCDateTime{} = datetime), do: {:ok, datetime}
-        def cast(%DateTime{} = datetime), do: {:ok, UTCDateTime.from_datetime(datetime)}
-        def cast(%NaiveDateTime{} = datetime), do: {:ok, UTCDateTime.from_naive(datetime)}
+        def cast(datetime = %UTCDateTime{}), do: {:ok, datetime}
+        def cast(datetime = %DateTime{}), do: {:ok, UTCDateTime.from_datetime(datetime)}
+        def cast(datetime = %NaiveDateTime{}), do: {:ok, UTCDateTime.from_naive(datetime)}
         def cast(datetime) when is_binary(datetime), do: UTCDateTime.from_iso8601(datetime)
         def cast(_), do: :error
 
@@ -34,7 +34,8 @@ defmodule UTCDateTime.EctoTyper do
 
         @impl Ecto.Type
         @spec dump(UTCDateTime.t()) :: {:ok, DateTime.t()} | :error
-        def dump(%UTCDateTime{} = datetime), do: {:ok, UTCDateTime.to_datetime(datetime)}
+        def dump(datetime = %UTCDateTime{}), do: {:ok, UTCDateTime.to_datetime(datetime)}
+        def dump(datetime = %DateTime{}), do: {:ok, datetime}
         def dump(_), do: :error
       end
     end

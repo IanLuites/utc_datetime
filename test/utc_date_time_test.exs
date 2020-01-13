@@ -86,6 +86,7 @@ defmodule UTCDateTimeTest do
       utc_datetime = UTCDateTime.from_datetime(datetime)
 
       assert UTCDateTime.dump(utc_datetime) == {:ok, datetime}
+      assert UTCDateTime.dump(datetime) == {:ok, datetime}
     end
 
     test "dump (usec)" do
@@ -93,6 +94,7 @@ defmodule UTCDateTimeTest do
       utc_datetime = UTCDateTime.from_datetime(datetime)
 
       assert UTCDateTime.USec.dump(utc_datetime) == {:ok, datetime}
+      assert UTCDateTime.USec.dump(datetime) == {:ok, datetime}
     end
   end
 
