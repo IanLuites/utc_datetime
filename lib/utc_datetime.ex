@@ -585,6 +585,14 @@ defmodule UTCDateTime do
   {:ok, ~Z[2015-01-23 23:50:07.123]}
   iex> UTCDateTime.from_rfc3339("2015-01-23T23:50:07.123-02:30")
   {:ok, ~Z[2015-01-24 02:20:07.123]}
+  iex> UTCDateTime.from_rfc3339("2015-01-23T23:50:07.123+0230")
+  {:ok, ~Z[2015-01-23 21:20:07.123]}
+  iex> UTCDateTime.from_rfc3339("2015-01-23T23:50:07.123-0230")
+  {:ok, ~Z[2015-01-24 02:20:07.123]}
+  iex> UTCDateTime.from_rfc3339("2015-01-23T23:50:07.123+02")
+  {:ok, ~Z[2015-01-23 21:50:07.123]}
+  iex> UTCDateTime.from_rfc3339("2015-01-23T23:50:07.123-02")
+  {:ok, ~Z[2015-01-24 01:50:07.123]}
   ```
 
   ```elixir
@@ -609,15 +617,15 @@ defmodule UTCDateTime do
   def from_rfc3339(datetime)
 
   @sep_rfc3339 [?t, ?T]
-  [match_date, guard_date, read_date] = Calendar.ISO.__match_date__()
-  [match_time, guard_time, read_time] = Calendar.ISO.__match_time__()
+  [match_date, guard_date, read_date] = __MODULE__.ISO.__match_date__()
+  [match_time, guard_time, read_time] = __MODULE__.ISO.__match_time__()
 
   # credo:disable-for-next-line Credo.Check.Refactor.CyclomaticComplexity
   def from_rfc3339(string) do
     with <<unquote(match_date), sep, unquote(match_time), rest::binary>> <- string,
          true <- unquote(guard_date) and sep in @sep_rfc3339 and unquote(guard_time),
-         {microsec, rest} <- ISO.parse_microsecond(rest),
-         {offset, ""} <- ISO.parse_offset(rest) do
+         {microsec, rest} <- __MODULE__.ISO.parse_microsecond(rest),
+         {offset, ""} <- __MODULE__.ISO.parse_offset(rest) do
       {year, month, day} = unquote(read_date)
       {hour, minute, second} = unquote(read_time)
 
@@ -732,6 +740,7 @@ defmodule UTCDateTime do
   end
 
   ### ISO 8601 ###
+  @sep_iso8601 [?T, ?\s, ?t]
 
   @doc ~S"""
   Parses the extended "Date and time of day" format described by
@@ -823,10 +832,6 @@ defmodule UTCDateTime do
                | :invalid_second}
   def from_iso8601(datetime)
 
-  @sep_iso8601 [?T, ?\s, ?t]
-
-  def from_iso8601(string)
-
   def from_iso8601("-" <> string) do
     with {:ok, utc_datetime = %{year: y}} <- from_iso8601(string),
          do: {:ok, %{utc_datetime | year: -y}}
@@ -836,8 +841,8 @@ defmodule UTCDateTime do
   def from_iso8601(string) do
     with <<unquote(match_date), sep, unquote(match_time), rest::binary>> <- string,
          true <- unquote(guard_date) and sep in @sep_iso8601 and unquote(guard_time),
-         {microsec, rest} <- ISO.parse_microsecond(rest),
-         {offset, ""} <- ISO.parse_offset(rest) do
+         {microsec, rest} <- __MODULE__.ISO.parse_microsecond(rest),
+         {offset, ""} <- __MODULE__.ISO.parse_offset(rest) do
       {year, month, day} = unquote(read_date)
       {hour, minute, second} = unquote(read_time)
 
@@ -1045,7 +1050,7 @@ defmodule UTCDateTime do
   def from_erl(erl_datetime, microsecond \\ {0, 0})
 
   # credo:disable-for-next-line Credo.Check.Refactor.CyclomaticComplexity
-  def from_erl({{year, month, day}, {hour, minute, second}}, {us, p} = microsecond) do
+  def from_erl({{year, month, day}, {hour, minute, second}}, microsecond = {us, p}) do
     cond do
       month > 12 ->
         {:error, :invalid_month}
@@ -1607,10 +1612,10 @@ defmodule UTCDateTime do
   """
   @spec truncate(UTCDateTime.t(), :microsecond | :millisecond | :second) :: UTCDateTime.t()
   def truncate(utc_datetime, precision)
-  def truncate(%UTCDateTime{} = utc_datetime, :microsecond), do: utc_datetime
-  def truncate(%UTCDateTime{} = utc_datetime, :second), do: %{utc_datetime | microsecond: {0, 0}}
+  def truncate(utc_datetime = %UTCDateTime{}, :microsecond), do: utc_datetime
+  def truncate(utc_datetime = %UTCDateTime{}, :second), do: %{utc_datetime | microsecond: {0, 0}}
 
-  def truncate(%UTCDateTime{microsecond: {microsecond, precision}} = utc_datetime, :millisecond) do
+  def truncate(utc_datetime = %UTCDateTime{microsecond: {microsecond, precision}}, :millisecond) do
     %{utc_datetime | microsecond: {div(microsecond, 1000) * 1000, min(precision, 3)}}
   end
 
