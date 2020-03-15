@@ -1359,7 +1359,6 @@ defmodule UTCDateTime do
 
   ## Examples
 
-
   ```elixir
   iex> UTCDateTime.to_ntfs(~Z[2019-12-20 23:20:52.832399])
   132213576528323990
