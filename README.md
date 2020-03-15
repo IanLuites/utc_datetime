@@ -41,7 +41,7 @@ by adding `utc_datetime` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:utc_datetime, "~> 0.0.13"}
+    {:utc_datetime, "~> 1.0"}
   ]
 end
 ```
@@ -79,6 +79,18 @@ or alternatively
 The `UTCDateTime.USec` is also available and will hold microsecond
 precision timestamps.
 
+### Fixtures
+[![Hex.pm](https://img.shields.io/hexpm/v/fixtures.svg "Hex")](https://hex.pm/packages/fixtures)
+
+Integrates with [Fixtures](https://github.com/IanLuites/fixtures) and
+supplies random UTC timestamps for testing and development.
+
+Example:
+```elixir
+iex> Fixtures.Time.timestamp
+~Z[1982-03-25 05:35:07]
+```
+
 
 ### Jason
 [![Hex.pm](https://img.shields.io/hexpm/v/jason.svg "Hex")](https://hex.pm/packages/jason)
@@ -107,6 +119,13 @@ iex> TimeMachinex.utc_now
 
 
 ## Changelog
+
+### v1.0.0 (2020-03-15)
+
+First actual release.
+
+Adds Elixir 1.10 support.
+
 
 ### v0.0.13 (2020-01-13)
 
